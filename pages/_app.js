@@ -7,12 +7,22 @@ import {
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import '@biconomy/web3-auth/dist/src/style.css';
+import { layouts } from '~/layouts';
 
 const theme = extendTheme(
   withDefaultColorScheme({
     colorScheme: 'twitter',
   })
 );
+
+const WithLayout = ({ Component, childProps }) => {
+  const LayoutComponent = layouts[Component.layout] ?? layouts.default;
+  return (
+    <LayoutComponent>
+      <Component {...childProps} />
+    </LayoutComponent>
+  );
+};
 
 const Web3AuthProvider = dynamic(
   () => import('~/contexts/auth').then((m) => m.Web3AuthProvider),
@@ -25,7 +35,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={theme}>
       <Web3AuthProvider>
-        <Component {...pageProps} />
+        <WithLayout Component={Component} childProps={pageProps} />
       </Web3AuthProvider>
     </ChakraProvider>
   );

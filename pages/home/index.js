@@ -1,16 +1,26 @@
+import { Text } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import React from 'react';
+import { useEffect } from 'react';
+import PageHeading from '~/components/page-heading';
 import { SwitchNetwork } from '~/components/switch-network';
-// import { useAccount } from '~/hooks/use-account';
+import { useWeb3Auth } from '~/contexts/auth';
+import { useUserId } from '~/hooks/use-user-id';
+import { layoutNames } from '~/layouts';
 
 const HomePage = () => {
-  // const { account } = useAccount();
+  const { userId, address } = useUserId();
 
   return (
     <div>
-      <SwitchNetwork />
-      {/* Hi <strong>{account}</strong> */}
+      <PageHeading>Overview</PageHeading>
+      <Text>
+        Hi <strong>{address}</strong>
+      </Text>
     </div>
   );
 };
+
+HomePage.layout = layoutNames.MERCHANT_DASHBOARD;
 
 export default HomePage;

@@ -6,6 +6,8 @@ import React, {
   useState,
 } from 'react';
 import { ethers } from 'ethers';
+import { useActiveAddress } from '~/atoms/active-address';
+import { useActiveNetwork } from '~/atoms/active-network';
 
 export const Web3AuthContext = React.createContext({
   connect: () => Promise.resolve(null),
@@ -46,10 +48,11 @@ export const Web3AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [socialLoginSDK, setSocialLoginSDK] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [activeAddress, setActiveAddress] = useActiveAddress();
+  const [activeNetwork] = useActiveNetwork();
 
   // if wallet already connected close widget
   useEffect(() => {
-    console.log('hidelwallet');
     if (socialLoginSDK && socialLoginSDK.provider) {
       socialLoginSDK.hideWallet();
     }
@@ -83,23 +86,22 @@ export const Web3AuthProvider = ({ children }) => {
       }
       setLoading(true);
       const sdk = await biconomy.current.getSocialLoginSDK();
+      await sdk.init(activeNetwork);
       sdk.showConnectModal();
       sdk.showWallet();
       setSocialLoginSDK(sdk);
       setLoading(false);
       return socialLoginSDK;
     } catch {}
-  }, [address, socialLoginSDK]);
+  }, [activeNetwork, address, socialLoginSDK]);
 
   const getUserInfo = useCallback(async () => {
     if (socialLoginSDK) {
       const userInfo = await socialLoginSDK.getUserInfo();
-      console.log('userInfo', userInfo);
       setUserInfo(userInfo);
     }
   }, [socialLoginSDK]);
 
-  // after metamask login -> get provider event
   useEffect(() => {
     const interval = setInterval(async () => {
       if (address) {
@@ -109,16 +111,26 @@ export const Web3AuthProvider = ({ children }) => {
         connect();
       }
     }, 1000);
+
     return () => {
       clearInterval(interval);
     };
   }, [address, connect, socialLoginSDK]);
 
   useEffect(() => {
-    import('@biconomy/web3-auth').then((mod) => {
-      biconomy.current = mod;
-    });
-  }, []);
+    import('@biconomy/web3-auth')
+      .then((mod) => {
+        biconomy.current = mod;
+      })
+      .then(() => {
+        if (activeAddress && !address) {
+          connect();
+        }
+        if (address) {
+          setActiveAddress(address);
+        }
+      });
+  }, [connect, address, activeAddress, setActiveAddress]);
 
   const disconnect = useCallback(async () => {
     if (!socialLoginSDK || !socialLoginSDK.web3auth) {

@@ -5,14 +5,15 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Text,
   useToast,
 } from '@chakra-ui/react';
-import { CaretDown } from 'phosphor-react';
+import { CaretDown, Circle } from 'phosphor-react';
 import React, { useCallback, useState } from 'react';
 import { chains, useActiveNetwork } from '~/atoms/active-network';
 import { useWeb3Auth } from '~/contexts/auth';
 
-export const SwitchNetwork = () => {
+export const SwitchNetwork = ({ floating = false }) => {
   const [activeNetwork, setActiveNetwork] = useActiveNetwork();
   const { web3Provider } = useWeb3Auth();
   const toast = useToast();
@@ -36,7 +37,11 @@ export const SwitchNetwork = () => {
   );
 
   return (
-    <Box position="fixed" top="4" right="4">
+    <Box
+      {...(floating
+        ? { position: 'fixed', top: '4', right: '4' }
+        : { width: 'full' })}
+    >
       <Menu colorScheme="twitter">
         <MenuButton
           as={Button}
@@ -46,9 +51,10 @@ export const SwitchNetwork = () => {
           rightIcon={<CaretDown />}
           color="black"
           size="sm"
+          w="full"
           disabled={!web3Provider}
         >
-          {chains[activeNetwork].chainName}
+          <Text ml="2">{chains[activeNetwork].chainName}</Text>
         </MenuButton>
         <MenuList>
           {Object.entries(chains).map(([key, chain]) => (

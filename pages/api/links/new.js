@@ -6,29 +6,20 @@ import {
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const {
-      name,
-      description,
       amount,
       expiry,
       preferred_token_address,
-      chainId,
-      wallet_address,
-      logoUrl,
+      preferred_chain_id,
     } = req.body.data;
     try {
       const user = await getUserByWalletAddress(wallet_address);
-      let userId;
-      if (!user.id) {
-        userId = await addUser({ name, description, wallet_address });
-      } else {
-        userId = user.id;
-      }
-      const paymentId = await createLink(userId, {
-        amount,
-        expiry,
-        preferred_token_address,
-        chainId,
-      });
+      // let userId;
+      // if (!user.id) {
+      //   userId = await addUser({ name, description, wallet_address });
+      // } else {
+      //   userId = user.id;
+      // }
+      const paymentId = await createLink(user.id, req.body.data);
 
       const response = {
         isSuccess: true,
