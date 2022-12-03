@@ -17,6 +17,7 @@
     "eslint-config-next": "13.0.6",
     "ethers": "^5.7.2",
     "framer-motion": "^6.5.1",
+    "firebase": "^8.10.1",
     "next": "13.0.6",
     "phosphor-react": "^1.4.1",
     "react": "18.2.0",
