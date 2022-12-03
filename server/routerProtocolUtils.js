@@ -10,6 +10,4 @@ export const getRouterProtocolInstance = async (chainId) => {
   const routerprotocol = new RouterProtocol(SDK_ID, chainId, provider);
   await routerprotocol.initialize()
   return routerprotocol;
-}
-
-
+};

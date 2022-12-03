@@ -40,6 +40,18 @@ export const tokens = [
     coinKey: 'ETH',
   },
   {
+    _id: '001',
+    address: '0x0000000000000000000000000000000000000000',
+    chainId: 5,
+    symbol: 'ETH',
+    decimals: 18,
+    name: 'ETH',
+    priceUSD: '1288.43',
+    logoURI:
+      'https://static.debank.com/image/token/logo_url/eth/935ae4e4d1d12d59a99717a24f2540b5.png',
+    coinKey: 'ETH',
+  },
+  {
     _id: '002',
     address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     chainId: 1,
