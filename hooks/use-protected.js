@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useWeb3Auth } from '~/contexts/auth';
+import { useBetterAuth } from '~/contexts/better-auth';
 
 export const useProtected = () => {
-  const { isConnected, address } = useWeb3Auth();
+  const { isConnected, account } = useBetterAuth();
   const { replace } = useRouter();
 
   useEffect(() => {
@@ -12,5 +13,5 @@ export const useProtected = () => {
     }
   }, [isConnected, replace]);
 
-  return { address, isConnected };
+  return { account, isConnected };
 };

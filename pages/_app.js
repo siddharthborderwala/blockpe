@@ -5,7 +5,6 @@ import {
   withDefaultColorScheme,
 } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
 import '@biconomy/web3-auth/dist/src/style.css';
 import { layouts } from '~/layouts';
 
@@ -24,19 +23,18 @@ const WithLayout = ({ Component, childProps }) => {
   );
 };
 
-const Web3AuthProvider = dynamic(
-  () => import('~/contexts/auth').then((m) => m.Web3AuthProvider),
+const BetterAuth = dynamic(
+  () => import('../contexts/better-auth').then((res) => res.BetterAuthProvider),
   {
     ssr: false,
   }
 );
-
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider theme={theme}>
-      <Web3AuthProvider>
+      <BetterAuth>
         <WithLayout Component={Component} childProps={pageProps} />
-      </Web3AuthProvider>
+      </BetterAuth>
     </ChakraProvider>
   );
 }

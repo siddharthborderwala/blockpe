@@ -22,17 +22,19 @@ import PageHeading from '~/components/page-heading';
 import { PrimaryButton } from '~/components/primary-button';
 import { SwitchNetwork } from '~/components/switch-network';
 import { useWeb3Auth } from '~/contexts/auth';
-import { chainMap, tokens } from '~/data';
+import { tokensByChain, chains } from '~/data';
 import { useProtected } from '~/hooks/use-protected';
 import { layoutNames } from '~/layouts';
 import { createUser } from '~/server/firebaseUtils';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 const Onboard = () => {
-  const { address, isConnected } = useProtected();
+  const { account, isConnected } = useProtected();
   const [logoURL, setLogoURL] = useState(undefined);
   const [name, setName] = useState('');
   const [preferredToken, setPreferredToken] = useState('');
-  const [preferredChain, setPreferredChain] = useState('');
+  const [preferredChain, setPreferredChain] = useState('1');
 
   const handleOnUpload = (err, result, cloudinary) => {
     if (err) {
@@ -48,6 +50,8 @@ const Onboard = () => {
   const handleSubmit = () => {
     createUser();
   };
+
+  const selectedChain = chains.find(({ id }) => Number(preferredChain) === id);
 
   return (
     <GradientFullBgLayout>
@@ -122,23 +126,38 @@ const Onboard = () => {
                     height={5}
                   />
                 </InputLeftAddon>
-                <Input type="text" disabled value={address} />
+                <Input type="text" disabled value={account} />
               </InputGroup>
             </FormControl>
             <FormControl isRequired>
               <FormLabel>Preferred Chain</FormLabel>
-              <Select
-                value={preferredChain}
-                onChange={(event) => {
-                  setPreferredChain(event.target.value);
-                }}
-              >
-                {Object.entries(chainMap).map(([chainId, { name }]) => (
-                  <option value={chainId} key={chainId}>
-                    <Text>{name}</Text>
-                  </option>
-                ))}
-              </Select>
+              <InputGroup>
+                <InputLeftAddon>
+                  <Image
+                    src={
+                      selectedChain?.logoURI ??
+                      'https://static.debank.com/image/token/logo_url/eth/935ae4e4d1d12d59a99717a24f2540b5.png'
+                    }
+                    alt={`${selectedChain?.name} logo`}
+                    width={5}
+                    height={5}
+                  />
+                </InputLeftAddon>
+                <Select
+                  value={preferredChain}
+                  onChange={(event) => {
+                    setPreferredChain(event.target.value);
+                  }}
+                  borderTopLeftRadius="0"
+                  borderBottomLeftRadius="0"
+                >
+                  {chains.map(({ id, name }) => (
+                    <option value={id} key={id}>
+                      <Text>{name}</Text>
+                    </option>
+                  ))}
+                </Select>
+              </InputGroup>
             </FormControl>
             <FormControl isRequired>
               <FormLabel>Preferred Token</FormLabel>
@@ -148,7 +167,7 @@ const Onboard = () => {
                   setPreferredToken(event.target.value);
                 }}
               >
-                {tokens.map((token) => (
+                {tokensByChain[Number(preferredChain)].map((token) => (
                   <option value={token.address} key={token.address}>
                     <Text>
                       {token.name} ({token.symbol})
