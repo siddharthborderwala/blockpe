@@ -19,6 +19,7 @@ import {
   Spacer,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { tokens } from '~/data';
 import axios from 'axios';
 import { GradientFullBgLayout } from '~/components/GradientFullBgLayout';
@@ -30,6 +31,7 @@ import PageHeading from '~/components/page-heading';
 const expireOptions = [0, 6, 12, 24];
 
 const CreateLink = () => {
+  const router = useRouter();
   const [merchantData, setMerchantData] = useState({
     name: '',
     description: '',
@@ -89,9 +91,8 @@ const CreateLink = () => {
       wallet_address: '0x111',
     };
 
-    const response = await axios.post('/api/links/new', { data: requestData });
-
-    console.log('response', response.data);
+    const { data } = await axios.post('/api/links/new', { data: requestData });
+    router.push(`/home/links/abc`);
   };
 
   return (
@@ -102,7 +103,7 @@ const CreateLink = () => {
           <Text>Create customized links to receive payments</Text>
         </Box>
 
-        <Box as="form" experimental_spaceY="4" onSubmit={onFormSubmit} mt="8">
+        <Box as="form" experimental_spaceY="4" mt="8" onSubmit={onFormSubmit}>
           <FormControl isRequired>
             <FormLabel>Name</FormLabel>
             <Input
