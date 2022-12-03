@@ -16,3 +16,18 @@ export const Name = () => {
     </Box>
   );
 };
+
+export const DashBoardName = () => {
+  return (
+    <Box display="flex" alignItems="center" marginTop="2rem" marginLeft="1rem">
+      <Cube weight="bold" fontSize="2.5rem" color="#2C5282" />
+      <Heading
+        bgGradient="linear(to-r, blue.600, blue.700)"
+        bgClip="text"
+        ml="2"
+      >
+        BlockPe
+      </Heading>
+    </Box>
+  );
+};
