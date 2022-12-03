@@ -4,18 +4,19 @@ import {
   GridItem,
   Box,
   Flex,
-  Link,
   Image,
   Divider,
   Text,
   Spinner,
   Center,
 } from '@chakra-ui/react';
-import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import QRCode from 'qrcode';
 import PageHeading from '~/components/page-heading';
 import { tokens } from '~/data';
 import axios from 'axios';
+import { PaymentURL } from '~/components/PaymentURL';
+import { PAYMENT_LINK_BASE_URL } from '~/constants';
 
 const opts = {
   errorCorrectionLevel: 'H',
@@ -29,7 +30,7 @@ const opts = {
 const PaymentLink = ({ linkId }) => {
   const [qrCodeSrc, setQRCodeSrc] = useState('');
   const paymentLink = useMemo(
-    () => `http://localhost:3000/pay/${linkId}`,
+    () => `${PAYMENT_LINK_BASE_URL}/${linkId ?? ''}`,
     [linkId]
   );
 
@@ -155,17 +156,11 @@ const PaymentLink = ({ linkId }) => {
               justifyContent="center"
               padding="2rem 8rem 2rem 0"
             >
-              <Link
-                href={paymentLink}
-                isExternal
-                fontSize="1.3rem"
-                marginBottom="2rem"
-                color="blue.700"
-              >
-                <Text noOfLines={1} width="25rem">
-                  {paymentLink}
-                </Text>
-              </Link>
+              <PaymentURL
+                linkURL={paymentLink}
+                linkProps={{ fontSize: '1.3rem', marginBottom: '2rem' }}
+                textProps={{ width: '25rem' }}
+              />
 
               <Flex alignItems="center">
                 <Divider width="6rem" />

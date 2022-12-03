@@ -1,16 +1,16 @@
 export const EVM_CHAINS = {
-  ETHEREUM: "ETHEREUM",
-  OPTIMISM: "OPTIMISM",
-  ARBITRUM: "ARBITRUM",
-  POLYGON: "POLYGON",
-  BNB: "BNB",
-  FANTOM: "FANTOM",
-  AVALANCHE: "AVALANCHE",
-  CRONOS: "CRONOS",
-  HARMONY: "HARMONY",
-  KAVA: "KAVA",
-  AURORA: "AURORA",
-  GOERLI: "GOERLI"
+  ETHEREUM: 'ETHEREUM',
+  OPTIMISM: 'OPTIMISM',
+  ARBITRUM: 'ARBITRUM',
+  POLYGON: 'POLYGON',
+  BNB: 'BNB',
+  FANTOM: 'FANTOM',
+  AVALANCHE: 'AVALANCHE',
+  CRONOS: 'CRONOS',
+  HARMONY: 'HARMONY',
+  KAVA: 'KAVA',
+  AURORA: 'AURORA',
+  GOERLI: 'GOERLI',
 };
 
 export const chainNameToIdentifierMap = {
@@ -26,7 +26,7 @@ export const chainNameToIdentifierMap = {
   [EVM_CHAINS.KAVA]: 2222,
   [EVM_CHAINS.AURORA]: 1313161554,
   [EVM_CHAINS.GOERLI]: 5,
-}
+};
 
 export const PAYMENT_LINK_STATUS = {
   PENDING: 'PENDING',
@@ -49,5 +49,7 @@ export const RPC_URL_MAP = {
   1666600000: [EVM_CHAINS.HARMONY],
   2222: [EVM_CHAINS.KAVA],
   1313161554: [EVM_CHAINS.AURORA],
-  5: "https://goerli.infura.io/v3/"
+  5: 'https://goerli.infura.io/v3/',
 };
+
+export const PAYMENT_LINK_BASE_URL = 'localhost:3000/pay';
