@@ -15,7 +15,8 @@ export const useUserId = () => {
 
   useEffect(() => {
     const loadUser = async () => {
-      const user = await getUserByWalletAddress();
+      if (!account) return null;
+      const user = await getUserByWalletAddress(account);
       if (user) {
         return user.id;
       }
@@ -28,7 +29,7 @@ export const useUserId = () => {
       }
       setUserId(id);
     });
-  }, [replace]);
+  }, [account, replace]);
 
   return {
     userId,

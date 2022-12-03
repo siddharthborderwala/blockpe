@@ -5,11 +5,18 @@ import { useEffect } from 'react';
 import PageHeading from '~/components/page-heading';
 import { SwitchNetwork } from '~/components/switch-network';
 import { useWeb3Auth } from '~/contexts/auth';
+import { useBetterAuth } from '~/contexts/better-auth';
 import { useUserId } from '~/hooks/use-user-id';
 import { layoutNames } from '~/layouts';
 
 const HomePage = () => {
   const { userId, address } = useUserId();
+  const { provider } = useBetterAuth();
+
+  useEffect(() => {
+    const res = provider.getSigner(address);
+    console.log(res);
+  }, [address, provider]);
 
   return (
     <div>

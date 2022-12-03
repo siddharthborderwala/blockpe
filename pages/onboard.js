@@ -12,6 +12,9 @@ import {
   InputLeftAddon,
   Spacer,
   Select,
+  Textarea,
+  Divider,
+  useToast,
 } from '@chakra-ui/react';
 import { UploadSimple } from 'phosphor-react';
 import React from 'react';
@@ -28,13 +31,22 @@ import { layoutNames } from '~/layouts';
 import { createUser } from '~/server/firebaseUtils';
 import { useEffect } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/router';
+import { useUserId } from '~/hooks/use-user-id';
 
 const Onboard = () => {
   const { account, isConnected } = useProtected();
+  const { userId } = useUserId();
   const [logoURL, setLogoURL] = useState(undefined);
   const [name, setName] = useState('');
-  const [preferredToken, setPreferredToken] = useState('');
-  const [preferredChain, setPreferredChain] = useState('1');
+  const [description, setDescription] = useState('');
+  const [preferredToken, setPreferredToken] = useState(
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
+  );
+  const [preferredChain, setPreferredChain] = useState('137');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
+  const { replace } = useRouter();
 
   const handleOnUpload = (err, result, cloudinary) => {
     if (err) {
@@ -47,9 +59,34 @@ const Onboard = () => {
     setLogoURL(result?.info?.secure_url);
   };
 
-  const handleSubmit = () => {
-    createUser();
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const userId = await createUser({
+        name: name,
+        description: description,
+        preferred_token_address: preferredToken,
+        preferred_chain_id: preferredChain,
+        wallet_address: account,
+        logoUrl: logoURL,
+      });
+      replace('/home');
+    } catch (err) {
+      toast({
+        status: 'error',
+        title: 'Failed to Register',
+        description: 'Please try again',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  useEffect(() => {
+    if (userId) {
+      replace('/home');
+    }
+  }, [replace, userId]);
 
   const selectedChain = chains.find(({ id }) => Number(preferredChain) === id);
 
@@ -78,6 +115,14 @@ const Onboard = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Bio</FormLabel>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="A little about your company (Optional Field)"
+              ></Textarea>
             </FormControl>
             <FormControl isRequired>
               <FormLabel>Company Logo</FormLabel>
@@ -115,6 +160,7 @@ const Onboard = () => {
               </UploadWidget>
               <Input type="url" value={logoURL} hidden />
             </FormControl>
+            <Divider />
             <FormControl isRequired>
               <FormLabel>Wallet Address</FormLabel>
               <InputGroup>
@@ -176,8 +222,7 @@ const Onboard = () => {
                 ))}
               </Select>
             </FormControl>
-            <Spacer />
-            <PrimaryButton w="full" type="submit">
+            <PrimaryButton w="full" type="submit" isLoading={isSubmitting}>
               Let&apos;s Go!
             </PrimaryButton>
           </Box>

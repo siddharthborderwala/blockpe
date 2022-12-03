@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { ChainId } from '@biconomy/core-types';
 import { useActiveAddress } from '~/atoms/active-address';
-// import SocialLogin from '@biconomy/web3-auth';
 
 export const BetterAuthContext = React.createContext({
   connect: () => Promise.resolve(null),
@@ -39,7 +38,7 @@ export const BetterAuthProvider = ({ children }) => {
       return socialLoginSDK;
     }
     const sdk = (await import('@biconomy/web3-auth')).socialLoginSDK;
-    await sdk.init(ethers.utils.hexValue(80001));
+    await sdk.init(ethers.utils.hexValue(5));
     setSocialLoginSDK(sdk);
     sdk.showConnectModal();
     sdk.showWallet();
