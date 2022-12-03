@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { ethers } from 'ethers';
 import { useActiveAddress } from '~/atoms/active-address';
+import { useActiveNetwork } from '~/atoms/active-network';
 
 export const Web3AuthContext = React.createContext({
   connect: () => Promise.resolve(null),
@@ -48,6 +49,7 @@ export const Web3AuthProvider = ({ children }) => {
   const [socialLoginSDK, setSocialLoginSDK] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [activeAddress, setActiveAddress] = useActiveAddress();
+  const [activeNetwork] = useActiveNetwork();
 
   // if wallet already connected close widget
   useEffect(() => {
@@ -84,13 +86,14 @@ export const Web3AuthProvider = ({ children }) => {
       }
       setLoading(true);
       const sdk = await biconomy.current.getSocialLoginSDK();
+      await sdk.init(activeNetwork);
       sdk.showConnectModal();
       sdk.showWallet();
       setSocialLoginSDK(sdk);
       setLoading(false);
       return socialLoginSDK;
     } catch {}
-  }, [address, socialLoginSDK]);
+  }, [activeNetwork, address, socialLoginSDK]);
 
   const getUserInfo = useCallback(async () => {
     if (socialLoginSDK) {

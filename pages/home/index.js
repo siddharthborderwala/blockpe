@@ -5,18 +5,11 @@ import { useEffect } from 'react';
 import PageHeading from '~/components/page-heading';
 import { SwitchNetwork } from '~/components/switch-network';
 import { useWeb3Auth } from '~/contexts/auth';
+import { useUserId } from '~/hooks/use-user-id';
 import { layoutNames } from '~/layouts';
 
 const HomePage = () => {
-  // const { account } = useAccount();
-  const { isConnected, address } = useWeb3Auth();
-  const { replace } = useRouter();
-
-  useEffect(() => {
-    if (!isConnected) {
-      replace('/join');
-    }
-  }, [isConnected, replace]);
+  const { userId, address } = useUserId();
 
   return (
     <div>

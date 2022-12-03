@@ -1,7 +1,13 @@
 import { Box, Button, Divider, Flex, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Activity, ChartLineUp, HouseSimple, LinkSimple } from 'phosphor-react';
+import {
+  Activity,
+  ChartLineUp,
+  Gear,
+  HouseSimple,
+  LinkSimple,
+} from 'phosphor-react';
 import { DashBoardName, Name } from '~/components/name';
 import { SwitchNetwork } from '~/components/switch-network';
 
@@ -20,6 +26,11 @@ const dashboardLinks = [
     name: 'Activity',
     href: '/home/activity',
     icon: <ChartLineUp weight="bold" />,
+  },
+  {
+    name: 'Settings',
+    href: '/home/settings',
+    icon: <Gear weight="bold" />,
   },
 ];
 
@@ -81,8 +92,7 @@ export const MerchantDashboard = ({ children }) => {
             </NavLink>
           ))}
         </Box>
-        <Divider mt="auto" />
-        <Box mt="4">
+        <Box mt="auto" w="full" px="4">
           <SwitchNetwork />
         </Box>
       </Flex>

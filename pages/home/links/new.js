@@ -16,6 +16,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  Spacer,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { tokens } from '~/data';
@@ -94,7 +95,7 @@ const CreateLink = () => {
   };
 
   return (
-    <Grid templateColumns="repeat(2, 1fr)">
+    <Grid templateColumns="4fr 3fr">
       <GridItem>
         <Box>
           <PageHeading>Create Link</PageHeading>
@@ -197,7 +198,9 @@ const CreateLink = () => {
             </FormControl>
           </Flex>
 
-          <PrimaryButton type="submit" leftIcon={<Plus weight="bold" />}>
+          <Spacer />
+
+          <PrimaryButton width="full" type="submit">
             Create
           </PrimaryButton>
         </Box>
