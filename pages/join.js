@@ -14,7 +14,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Name } from '~/components/name';
 import { SwitchNetwork } from '~/components/switch-network';
 import { useWeb3Auth } from '~/contexts/auth';
-import { useClient } from '~/hooks/use-client';
 
 const Join = () => {
   const [showMetamaskOption, setShowMetamaskOption] = useState(false);
