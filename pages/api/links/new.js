@@ -6,10 +6,7 @@ import {
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const {
-      amount,
-      expiry,
-      preferred_token_address,
-      preferred_chain_id,
+      wallet_address
     } = req.body.data;
     try {
       const user = await getUserByWalletAddress(wallet_address);
@@ -19,6 +16,7 @@ export default async function handler(req, res) {
       // } else {
       //   userId = user.id;
       // }
+      console.log({ user })
       const paymentId = await createLink(user.id, req.body.data);
 
       const response = {
