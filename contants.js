@@ -1,5 +1,0 @@
-export const PAYMENT_LINK_STATUS = {
-  PENDING: "PENDING",
-  EXPIRED: "EXPIRED",
-  PAID: "PAID",
-}

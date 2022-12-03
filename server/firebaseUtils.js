@@ -1,4 +1,4 @@
-import { PAYMENT_LINK_STATUS } from '../contants';
+import { PAYMENT_LINK_STATUS } from '../constants';
 
 const firebase = require('firebase');
 // Required for side-effects
@@ -30,7 +30,7 @@ export async function addUser(payload) {
   return docRef.id;
 }
 
-export async function getUser(docId) {
+export async function getUserByWalletAddress(docId) {
   try {
     const getUserQuery = db
       .collection('users')
@@ -45,6 +45,17 @@ export async function getUser(docId) {
     return false;
   } catch (err) {
     console.error('Error reading user document: ', err);
+  }
+}
+
+export async function getUserById(userId) {
+  try {
+    const user = await db.collection('users').doc(userId).get();
+    const data = user.data();
+    if (data) return data;
+    else false;
+  } catch (err) {
+    console.error('Error reading user: ', err);
   }
 }
 
