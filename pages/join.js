@@ -16,16 +16,16 @@ import { Name } from '~/components/name';
 import { PrimaryButton } from '~/components/primary-button';
 import { SwitchNetwork } from '~/components/switch-network';
 import { useWeb3Auth } from '~/contexts/auth';
+import { useBetterAuth } from '~/contexts/better-auth';
 
 const Join = () => {
   const [showMetamaskOption, setShowMetamaskOption] = useState(false);
   const toast = useToast();
   const { replace } = useRouter();
-  const { connect, loading, web3Provider, isConnected, account } =
-    useWeb3Auth();
+  const { connect, isLoading, isConnected } = useBetterAuth();
 
   const handleConnectWallet = useCallback(async () => {
-    if (loading) return;
+    if (isLoading) return;
     try {
       await connect();
       // const response = await client.current.send('eth_requestAccounts', []);
@@ -41,7 +41,7 @@ const Join = () => {
         console.log('err', err);
       }
     }
-  }, [connect, loading, toast]);
+  }, [connect, isLoading, toast]);
 
   useEffect(() => {
     if (isConnected) {
@@ -68,7 +68,7 @@ const Join = () => {
           background="black"
           colorScheme="blackAlpha"
           rightIcon={<Wallet weight="bold" />}
-          isLoading={loading}
+          isLoading={isLoading}
         >
           Connect Wallet
         </PrimaryButton>
