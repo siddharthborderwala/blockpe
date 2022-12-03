@@ -27,7 +27,7 @@ async function updateLinkStatus(res, paymentId, status) {
 }
 
 export default function handler(req, res) {
-  const paymentId = req.query;
+  const paymentId = req.query.linkId;
   const { status } = req.body;
   switch(req.method) {
     case "GET": {

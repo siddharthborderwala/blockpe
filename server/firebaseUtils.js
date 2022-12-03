@@ -1,92 +1,108 @@
-import { PAYMENT_LINK_STATUS } from "../contants";
+import { PAYMENT_LINK_STATUS } from '../contants';
 
-const firebase = require("firebase");
+const firebase = require('firebase');
 // Required for side-effects
-require("firebase/firestore");
+require('firebase/firestore');
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDY_XDSekHK3nEGq-VxtvthLRCWaJXNHZk",
-  authDomain: "blockpe-db.firebaseapp.com",
-  projectId: "blockpe-db",
-  storageBucket: "blockpe-db.appspot.com",
-  messagingSenderId: "235167614224",
-  appId: "1:235167614224:web:18ae931b46fbe073e85195",
-  measurementId: "G-BGE126JRJP",
+  apiKey: 'AIzaSyDY_XDSekHK3nEGq-VxtvthLRCWaJXNHZk',
+  authDomain: 'blockpe-db.firebaseapp.com',
+  projectId: 'blockpe-db',
+  storageBucket: 'blockpe-db.appspot.com',
+  messagingSenderId: '235167614224',
+  appId: '1:235167614224:web:18ae931b46fbe073e85195',
+  measurementId: 'G-BGE126JRJP',
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+} else {
+  firebase.app(); // if already initialized, use that one
+}
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = firebase.firestore();
 
 export async function addUser(payload) {
-  try {
-    const docRef = await db.collection("users").add(payload);
-    return docRef.id;
-  } catch (err) {
-    console.error("Error adding user document: ", error);
-  }
+  const docRef = await db.collection('users').add(payload);
+  return docRef.id;
 }
 
 export async function getUser(docId) {
   try {
-    const doc = await db.collection("users").doc(docId);
-    const data = doc.get();
-    if(data.exists) return data
-    else false;
+    const getUserQuery = db
+      .collection('users')
+      .where('wallet_address', '==', docId);
+
+    const results = await getUserQuery.get();
+    const userIds = [];
+    results.forEach((doc) => {
+      userIds.push(doc.id);
+    });
+    if (userIds.length) return { id: userIds[0] };
+    return false;
   } catch (err) {
-    console.error("Error reading user document: ", error);
+    console.error('Error reading user document: ', err);
   }
 }
 
 export async function createLink(userId, metadata) {
   try {
-    const paymentRef = await db.collection("paymentLinks").add({
+    const paymentRef = await db.collection('paymentLinks').add({
       userId,
       data: metadata,
       status: PAYMENT_LINK_STATUS.PENDING,
     });
     return paymentRef.id;
   } catch (err) {
-    console.error("Error creating payment link: ", error);
+    console.error('Error creating payment link: ', err);
   }
 }
 
-
 export async function getPaymentLinkById(paymentId) {
   try {
-    const paymentDoc = await db.collection("paymentLinks").doc(paymentId);
-    const data = paymentDoc.get();
-    if(data.exists) return data
+    const paymentDoc = await db.collection('paymentLinks').doc(paymentId).get();
+    const data = paymentDoc.data();
+    if (data) return data;
     else false;
   } catch (err) {
-    console.error("Error reading payment document: ", error);
+    console.error('Error reading payment document: ', err);
   }
 }
 
 export async function getPaymentLinksByUserId(userId) {
   try {
-    const paymentDocs = await db.collection("paymentLinks").where("userId", "==", userId);
-    const data = await Promise.all(paymentDocs.map(async doc => await doc.get()));
-    if(data.exists) return data
-    else false;
+    const paymentLinksQuery = db
+      .collection('paymentLinks')
+      .where('userId', '==', userId);
+    const results = await paymentLinksQuery.get();
+
+    const links = [];
+    results.forEach((doc) => {
+      links.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+    if (links.length) return links;
+    return false;
   } catch (err) {
-    console.error("Error reading payment document: ", error);
+    console.error('Error reading payment document: ', err);
   }
 }
 
 export async function updatePaymentLinkById(paymentId, status) {
   try {
-    const paymentDoc = await db.collection("paymentLinks").doc(paymentId);
-    const data = paymentDoc.get();
-    if(data.exists) {
-      paymentDoc.set({
-        status
-      })
+    const paymentDoc = db.collection('paymentLinks').doc(paymentId);
+    const data = await paymentDoc.get();
+    if (data) {
+      await paymentDoc.update({
+        status,
+      });
     }
   } catch (err) {
-    console.error("Error reading payment document: ", error);
+    console.error('Error reading payment document: ', err);
   }
 }
-
