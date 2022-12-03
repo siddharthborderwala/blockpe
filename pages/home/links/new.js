@@ -92,7 +92,8 @@ const CreateLink = () => {
     };
 
     const { data } = await axios.post('/api/links/new', { data: requestData });
-    router.push(`/home/links/abc`);
+    console.log('data', data);
+    router.push(`/home/links/${data.payment_id}`);
   };
 
   return (

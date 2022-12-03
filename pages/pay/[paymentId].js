@@ -13,7 +13,7 @@ import {
   Input,
   FormHelperText,
   Textarea,
-  Spinner
+  Spinner,
 } from '@chakra-ui/react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { tokens } from '~/data';
@@ -69,8 +69,6 @@ const Pay = ({ paymentId }) => {
     setAmount(e.target.value);
   };
 
-
-
   const fetchPaymentDetails = useCallback(async () => {
     try {
       setIsMetadataLoading(true);
@@ -105,12 +103,9 @@ const Pay = ({ paymentId }) => {
     fetchPaymentDetails();
   }, [paymentId]);
 
-
-
   // router protocol integration
   const onFormSubmit = async (event) => {
-    console.log({ event })
-
+    console.log({ event });
   };
 
   return (

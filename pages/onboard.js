@@ -70,7 +70,7 @@ const Onboard = () => {
               <FormLabel>Merchant Name</FormLabel>
               <Input
                 type="text"
-                placeholder="Acme Corp"
+                placeholder="BlockPe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
