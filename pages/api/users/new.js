@@ -2,25 +2,18 @@ import { addUser, createLink, getUserByWalletAddress } from '../../../server/fir
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const {
-      amount,
-      expiry,
+      name,
+      description,
       preferred_token_address,
       preferred_chain_id,
+      wallet_address,
+      logoUrl
     } = req.body.data;
     try {
-      console.log({body: req.body});
-      const user = await getUserByWalletAddress(wallet_address);
-      // let userId;
-      // if (!user.id) {
-      //   userId = await addUser({ name, description, wallet_address });
-      // } else {
-      //   userId = user.id;
-      // }
-      const paymentId = await createLink(user.id, req.body.data);
-
+      const userId = await createUser(req.body.data);
       const response = {
         isSuccess: true,
-        payment_id: paymentId,
+        userId
       };
       res.json(response);
     } catch (err) {

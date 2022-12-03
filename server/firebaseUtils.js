@@ -63,7 +63,7 @@ export async function createLink(userId, metadata) {
   try {
     const paymentRef = await db.collection('paymentLinks').add({
       userId,
-      data: metadata,
+      ...metadata,
       status: PAYMENT_LINK_STATUS.PENDING,
     });
     return paymentRef.id;
@@ -115,5 +115,32 @@ export async function updatePaymentLinkById(paymentId, status) {
     }
   } catch (err) {
     console.error('Error reading payment document: ', err);
+  }
+}
+
+
+export async function createUser(payload) {
+  try {
+    const userRef = await db.collection('users').add({
+     ...payload
+    });
+    return userRef.id;
+  } catch (err) {
+    console.error('Error creating user: ', err);
+  }
+}
+
+
+export async function updateUser(userId, payload) {
+  try {
+    const paymentDoc = db.collection('users').doc(userId);
+    const data = await paymentDoc.get();
+    if (data) {
+      await paymentDoc.update({
+        ...payload,
+      });
+    }
+  } catch (err) {
+    console.error('Error updating user document: ', err);
   }
 }
