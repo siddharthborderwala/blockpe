@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 import { Wallet } from 'phosphor-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Name } from '~/components/name';
+import { PrimaryButton } from '~/components/primary-button';
 import { SwitchNetwork } from '~/components/switch-network';
 import { useWeb3Auth } from '~/contexts/auth';
 
@@ -53,13 +54,13 @@ const Join = () => {
       height="100vh"
       bgGradient="linear(to-r, blue.300, blue.500)"
     >
-      <SwitchNetwork />
+      <SwitchNetwork floating />
       <Box padding="8" background="white" rounded="lg" shadow="lg">
         <Name />
         <Text mt="2" fontWeight="medium">
           Get started with crypto payments in minutes
         </Text>
-        <Button
+        <PrimaryButton
           mt="4"
           onClick={handleConnectWallet}
           background="black"
@@ -68,7 +69,7 @@ const Join = () => {
           isLoading={loading}
         >
           Connect Wallet
-        </Button>
+        </PrimaryButton>
 
         {showMetamaskOption ? (
           <Box>
