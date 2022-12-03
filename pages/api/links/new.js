@@ -1,4 +1,8 @@
-import { addUser, createLink, getUserByWalletAddress } from '../../../server/firebaseUtils';
+import {
+  addUser,
+  createLink,
+  getUserByWalletAddress,
+} from '../../../server/firebaseUtils';
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const {
@@ -9,10 +13,9 @@ export default async function handler(req, res) {
       preferred_token_address,
       chainId,
       wallet_address,
-      logoUrl
-    } = req.body;
+      logoUrl,
+    } = req.body.data;
     try {
-      console.log({body: req.body});
       const user = await getUserByWalletAddress(wallet_address);
       let userId;
       if (!user.id) {
@@ -20,12 +23,11 @@ export default async function handler(req, res) {
       } else {
         userId = user.id;
       }
-      console.log({ userId })
       const paymentId = await createLink(userId, {
         amount,
         expiry,
         preferred_token_address,
-        chainId
+        chainId,
       });
 
       const response = {
