@@ -7,6 +7,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Wallet } from 'phosphor-react';
@@ -54,6 +55,7 @@ const Join = () => {
       height="100vh"
       bgGradient="linear(to-r, blue.300, blue.500)"
     >
+      <Head>Join BlockPe</Head>
       <SwitchNetwork floating />
       <Box padding="8" background="white" rounded="lg" shadow="lg">
         <Name />

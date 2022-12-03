@@ -1,5 +1,5 @@
-import axios from "axios";
-import { COVALENT_BASE_URL, identifierToChainNameMap } from "../constants";
+import axios from 'axios';
+import { COVALENT_BASE_URL } from '../constants';
 
 const API_KEY = 'ckey_346a864b0b0c407e800381e94b9';
 
@@ -14,9 +14,12 @@ export async function getActivityByChainId(address, chainId) {
 }
 
 export async function getActivityForAllChains(address, chainIds) {
-  const activities = await Promise.all(chainIds.map(async (chainId) => {
-    const activity = await getActivityByChainId(address, chainId);
-    return activity;``
-  }))
+  const activities = await Promise.all(
+    chainIds.map(async (chainId) => {
+      const activity = await getActivityByChainId(address, chainId);
+      return activity;
+      ``;
+    })
+  );
   return activities.flat();
 }

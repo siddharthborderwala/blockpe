@@ -39,7 +39,7 @@ const initialState = {
   isConnected: false,
 };
 
-export const Web3AuthProvider = ({ children }) => {
+export const Web3AuthProvider = ({ children, autoReConnect = true }) => {
   const biconomy = useRef();
   const [
     { provider, web3Provider, ethersProvider, address, chainId },
@@ -118,19 +118,20 @@ export const Web3AuthProvider = ({ children }) => {
   }, [address, connect, socialLoginSDK]);
 
   useEffect(() => {
+    if (address) return;
     import('@biconomy/web3-auth')
       .then((mod) => {
         biconomy.current = mod;
       })
       .then(() => {
-        if (activeAddress && !address) {
+        if (activeAddress && !address && autoReConnect) {
           connect();
         }
-        if (address) {
-          setActiveAddress(address);
-        }
       });
-  }, [connect, address, activeAddress, setActiveAddress]);
+    if (address) {
+      setActiveAddress(address);
+    }
+  }, [connect, address, activeAddress, setActiveAddress, autoReConnect]);
 
   const disconnect = useCallback(async () => {
     if (!socialLoginSDK || !socialLoginSDK.web3auth) {

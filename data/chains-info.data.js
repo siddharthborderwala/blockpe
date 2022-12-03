@@ -12,18 +12,18 @@ const EVM_CHAINS = {
   AURORA: 'AURORA',
 };
 
-export const identifierToChainNameMap = {
-  1: [EVM_CHAINS.ETHEREUM],
-  10: [EVM_CHAINS.OPTIMISM],
-  42161: [EVM_CHAINS.ARBITRUM],
-  137: [EVM_CHAINS.POLYGON],
-  56: [EVM_CHAINS.BNB],
-  250: [EVM_CHAINS.FANTOM],
-  43114: [EVM_CHAINS.AVALANCHE],
-  25: [EVM_CHAINS.CRONOS],
-  1666600000: [EVM_CHAINS.HARMONY],
-  2222: [EVM_CHAINS.KAVA],
-  1313161554: [EVM_CHAINS.AURORA],
+export const chainMap = {
+  1: { name: [EVM_CHAINS.ETHEREUM] },
+  10: { name: [EVM_CHAINS.OPTIMISM] },
+  42161: { name: [EVM_CHAINS.ARBITRUM] },
+  137: { name: [EVM_CHAINS.POLYGON] },
+  56: { name: [EVM_CHAINS.BNB] },
+  250: { name: [EVM_CHAINS.FANTOM] },
+  43114: { name: [EVM_CHAINS.AVALANCHE] },
+  25: { name: [EVM_CHAINS.CRONOS] },
+  1666600000: { name: [EVM_CHAINS.HARMONY] },
+  2222: { name: [EVM_CHAINS.KAVA] },
+  1313161554: { name: [EVM_CHAINS.AURORA] },
 };
 
 export const tokens = [

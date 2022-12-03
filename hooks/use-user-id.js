@@ -3,17 +3,14 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useWeb3Auth } from '~/contexts/auth';
 import { getUserByWalletAddress } from '~/server/firebaseUtils';
+import { useProtected } from './use-protected';
 
 export const useUserId = () => {
-  const { isConnected, address } = useWeb3Auth();
+  const { address } = useWeb3Auth();
   const { replace } = useRouter();
   const [userId, setUserId] = useState(null);
 
-  useEffect(() => {
-    if (!isConnected) {
-      replace('/join');
-    }
-  }, [isConnected, replace]);
+  useProtected();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -26,7 +23,7 @@ export const useUserId = () => {
 
     loadUser().then((id) => {
       if (!id) {
-        replace('/home/onboard');
+        replace('/onboard');
       }
       setUserId(id);
     });
