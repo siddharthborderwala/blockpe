@@ -23,32 +23,32 @@ const Activity = () => {
 
   const account = '0x18D75D38538Aa13DdC643841303D156C99c19dED';
 
-  useEffect(() => {
-    (async () => {
-      if (!isLoading && allLinks) {
-        let allLinksChainIds = allLinks.map(
-          (link) => link.metadata.preferred_chain_id
-        );
-        allLinksChainIds = [...new Set(allLinksChainIds)];
+  // useEffect(() => {
+  //   (async () => {
+  //     if (!isLoading && allLinks) {
+  //       let allLinksChainIds = allLinks.map(
+  //         (link) => link.preferred_chain_id
+  //       );
+  //       allLinksChainIds = [...new Set(allLinksChainIds)];
 
-        // const { data } = await Promise.all(
-        //   allLinksChainIds.map((id) =>
-        //     axios.get(
-        //       `https://api.covalenthq.com/v1/${137}/address/${account}/transactions_v2/?key=ckey_bad512c2a8964e748e5b5fcf7a4`
-        //     )
-        //   )
-        // );
+  //       // const { data } = await Promise.all(
+  //       //   allLinksChainIds.map((id) =>
+  //       //     axios.get(
+  //       //       `https://api.covalenthq.com/v1/${137}/address/${account}/transactions_v2/?key=ckey_bad512c2a8964e748e5b5fcf7a4`
+  //       //     )
+  //       //   )
+  //       // );
 
-        // const { data } = await axios.get(
-        //   `https://api.covalenthq.com/v1/${250}/address/${account}/transactions_v2/?key=ckey_bad512c2a8964e748e5b5fcf7a4`
-        // );
+  //       // const { data } = await axios.get(
+  //       //   `https://api.covalenthq.com/v1/${250}/address/${account}/transactions_v2/?key=ckey_bad512c2a8964e748e5b5fcf7a4`
+  //       // );
 
-        const data = await getActivityByChainId(account, 250);
+  //       const data = await getActivityByChainId(account, 250);
 
-        console.log('data', data);
-      }
-    })();
-  }, [account, allLinks, isLoading]);
+  //       console.log('data', data);
+  //     }
+  //   })();
+  // }, [account, allLinks, isLoading]);
 
   return (
     <Box>

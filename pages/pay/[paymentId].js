@@ -22,8 +22,6 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { chains, tokens, tokensByChain } from '~/data';
 import axios from 'axios';
 import { GradientFullBgLayout } from '~/components/GradientFullBgLayout';
-import { chainNameToIdentifierMap } from '~/constants';
-import { capitalize } from '~/utils';
 import { useWeb3Auth } from '~/contexts/auth';
 import { PrimaryButton } from '~/components/primary-button';
 import { SwitchNetwork } from '~/components/switch-network';
@@ -31,7 +29,12 @@ import { useBetterAuth } from '~/contexts/better-auth';
 import { useActiveNetwork } from '~/atoms/active-network';
 import { Name } from '~/components/name';
 import { Lock, Question } from 'phosphor-react';
+import {
+  getRouterProtocolInstance,
+  makeTransaction,
+} from '~/server/routerProtocolUtils';
 import { ethers } from 'ethers';
+import { convertFromTokenToToken } from '~/data/rates';
 
 const SectionHeading = ({ children }) => {
   return (
@@ -51,6 +54,7 @@ const Pay = ({ paymentId }) => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
+
   const [isMetadataLoading, setIsMetadataLoading] = useState(false);
   const [merchantInfo, setMerchantInfo] = useState({});
   const [preferredTokenId, setPreferredTokenId] = useState(
@@ -58,7 +62,10 @@ const Pay = ({ paymentId }) => {
   );
   const toast = useToast();
   const [activeNetwork, setActiveNetwork] = useActiveNetwork();
-  const { connect, isLoading, isConnected, provider } = useBetterAuth();
+  const { connect, isLoading, isConnected, provider, account } =
+    useBetterAuth();
+
+  const [inProgress, setInProgress] = useState(false);
 
   const tokens = tokensByChain[activeNetwork];
 
@@ -111,7 +118,10 @@ const Pay = ({ paymentId }) => {
       const user = resUser.data;
 
       setName(paymentLink.name);
-      setAmount(paymentLink.amount);
+      const coin = tokens.find(token => token.address === user.preferred_token_address);
+      const conversionFactor = convertFromTokenToToken(coin.coinKey, preferredToken.coinKey);
+      setAmount((Number(paymentLink.amount)  * Number(conversionFactor)).toFixed(4));
+
       setDescription(paymentLink.description);
 
       setMerchantInfo({
@@ -128,12 +138,42 @@ const Pay = ({ paymentId }) => {
     }
   }, [paymentId]);
 
+  const feeTokenAddress = useMemo(() =>
+    tokensByChain[activeNetwork].find((token) => token.coinKey === 'USDC').address,
+    [activeNetwork]
+  );
+
   useEffect(() => {
     fetchPaymentDetails();
   }, [fetchPaymentDetails, paymentId]);
 
-  const onFormSubmit = async (e) => {
-    e.preventDefault();
+  // router protocol integration
+  const onFormSubmit = async (event) => {
+    event.preventDefault();
+    const args = {
+      fromTokenAddress: preferredTokenId, // USDC on Polygon
+      toTokenAddress: merchantInfo.tokenAddress, // FTM on Fantom
+      amount: ethers.utils
+        .parseUnits(amount, preferredToken.decimal)
+        .toString(),
+      fromTokenChainId: merchantInfo.chainId, //  Polygon
+      toTokenChainId: activeNetwork, // Fantom
+      userAddress: account,
+      feeTokenAddress, // ROUTE on Polygon
+      slippageTolerance: 1.0,
+      widgetId: 24, // get your unique wdiget id by contacting us on Telegram
+      destReceiverAddress: merchantInfo.walletAddress,
+    };
+    try {
+      setInProgress(true);
+      await makeTransaction(args, activeNetwork, provider);
+      toast({ status: 'success', title: 'Success', description: 'Amount has been received', onCloseComplete: () => window.close()});
+    } catch (err) {
+      console.log('tx err', err);
+      toast({ status: 'error', title: 'Error', description: 'Transaction could not be processed'});
+    } finally {
+      setInProgress(false);
+    }
   };
 
   return (
@@ -302,6 +342,7 @@ const Pay = ({ paymentId }) => {
               </PrimaryButton>
             ) : (
               <PrimaryButton
+                isLoading={inProgress}
                 width="100%"
                 type="submit"
                 mt="6"

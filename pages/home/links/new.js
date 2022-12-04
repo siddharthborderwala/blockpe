@@ -119,7 +119,7 @@ const CreateLink = () => {
                       tokensByChain[merchantData.preferred_chain_id].find(
                         ({ address }) =>
                           address === merchantData.preferred_token_address
-                      ).logoURI
+                      )?.logoURI ?? 'https://static.debank.com/image/token/logo_url/eth/935ae4e4d1d12d59a99717a24f2540b5.png'
                     }
                   ></Image>
                 )}
