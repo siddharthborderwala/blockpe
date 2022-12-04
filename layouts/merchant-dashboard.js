@@ -96,7 +96,7 @@ export const MerchantDashboard = ({ children }) => {
           <SwitchNetwork />
         </Box>
       </Flex>
-      <Box pt="4" px="6" height="100vh" width="full">
+      <Box py="4" px="6" height="100vh" width="full">
         {children}
       </Box>
     </Box>

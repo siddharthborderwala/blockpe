@@ -87,7 +87,7 @@ const Onboard = () => {
     if (userId) {
       replace('/home/links');
     }
-  }, [replace, userId]);
+  }, [userId]);
 
   const selectedChain = chains.find(({ id }) => Number(preferredChain) === id);
 

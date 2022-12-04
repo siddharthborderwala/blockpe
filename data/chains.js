@@ -4,6 +4,7 @@ export const chains = [
     chainType: 'EVM',
     name: 'Ethereum',
     coin: 'ETH',
+    coingeckoId: 'ethereum',
     id: 1,
     mainnet: true,
     logoURI:
@@ -36,6 +37,7 @@ export const chains = [
     chainType: 'EVM',
     name: 'Polygon',
     coin: 'MATIC',
+    coingeckoId: 'polygon-pos',
     id: 137,
     mainnet: true,
     logoURI:

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { ChainId } from '@biconomy/core-types';
 import { useActiveAddress } from '~/atoms/active-address';
+import { useActiveNetwork } from '~/atoms/active-network';
 
 export const BetterAuthContext = React.createContext({
   connect: () => Promise.resolve(null),
@@ -20,6 +21,7 @@ export const BetterAuthProvider = ({ children }) => {
   const [socialLoginSDK, setSocialLoginSDK] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [activeAddress, setActiveAddress] = useActiveAddress();
+  const [activeNetwork] = useActiveNetwork();
 
   const connect = useCallback(async () => {
     if (typeof window === 'undefined') return;
@@ -38,13 +40,13 @@ export const BetterAuthProvider = ({ children }) => {
       return socialLoginSDK;
     }
     const sdk = (await import('@biconomy/web3-auth')).socialLoginSDK;
-    await sdk.init(ethers.utils.hexValue(5));
+    await sdk.init(ethers.utils.hexValue(activeNetwork));
     setSocialLoginSDK(sdk);
     sdk.showConnectModal();
     sdk.showWallet();
     setIsLoading(false);
     return socialLoginSDK;
-  }, [socialLoginSDK]);
+  }, [activeNetwork, socialLoginSDK]);
 
   const fetchUserInfo = useCallback(async () => {
     if (socialLoginSDK) {

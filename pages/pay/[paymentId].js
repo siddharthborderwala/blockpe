@@ -14,9 +14,12 @@ import {
   FormHelperText,
   Textarea,
   Spinner,
+  Tooltip,
+  Heading,
+  useToast,
 } from '@chakra-ui/react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { tokens } from '~/data';
+import { chains, tokens, tokensByChain } from '~/data';
 import axios from 'axios';
 import { GradientFullBgLayout } from '~/components/GradientFullBgLayout';
 import { chainNameToIdentifierMap } from '~/constants';
@@ -24,45 +27,72 @@ import { capitalize } from '~/utils';
 import { useWeb3Auth } from '~/contexts/auth';
 import { PrimaryButton } from '~/components/primary-button';
 import { SwitchNetwork } from '~/components/switch-network';
+import { useBetterAuth } from '~/contexts/better-auth';
+import { useActiveNetwork } from '~/atoms/active-network';
+import { Name } from '~/components/name';
+import { Lock, Question } from 'phosphor-react';
+import { ethers } from 'ethers';
+
+const SectionHeading = ({ children }) => {
+  return (
+    <Heading
+      as="h4"
+      textTransform="uppercase"
+      color="gray.500"
+      letterSpacing="widest"
+      fontSize="12px"
+    >
+      {children}
+    </Heading>
+  );
+};
 
 const Pay = ({ paymentId }) => {
-  console.log({ paymentId });
-
-  const [chainId, setChainId] = useState(5);
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [name, setName] = useState('');
   const [isMetadataLoading, setIsMetadataLoading] = useState(false);
-
   const [merchantInfo, setMerchantInfo] = useState({});
+  const [preferredTokenId, setPreferredTokenId] = useState(
+    '0x0000000000000000000000000000000000000000'
+  );
+  const toast = useToast();
+  const [activeNetwork, setActiveNetwork] = useActiveNetwork();
+  const { connect, isLoading, isConnected, provider } = useBetterAuth();
 
-  const [preferredToken, setPreferredToken] = useState({
-    logoURI:
-      'https://static.debank.com/image/token/logo_url/eth/935ae4e4d1d12d59a99717a24f2540b5.png',
-    name: 'ETH',
-  });
-  const { connect, loading, isConnected } = useWeb3Auth();
+  const tokens = tokensByChain[activeNetwork];
 
-  const tokenList = useMemo(() => {
-    const updatedTokenList = tokens.filter(
-      (token) => token.chainId === chainId
-    );
-    setPreferredToken(updatedTokenList[0]);
-    return updatedTokenList;
-  }, [chainId]);
+  const preferredToken = tokens.find(
+    (token) => token.address === preferredTokenId
+  );
+
+  const handleNetworkChange = useCallback(
+    async (chainId) => {
+      console.log(chainId);
+      try {
+        await provider?.send('wallet_switchEthereumChain', [
+          { chainId: `${ethers.utils.hexValue(chainId)}` },
+        ]);
+        setActiveNetwork(chainId);
+      } catch (err) {
+        if (err.code) {
+          toast({
+            status: 'error',
+            title: `Couldn't switch network`,
+            description: err.message,
+          });
+        }
+      }
+    },
+    [provider, setActiveNetwork, toast]
+  );
 
   const handleSelectChain = (event) => {
-    setChainId(Number(event.target.value));
+    handleNetworkChange(Number(event.target.value));
   };
 
   const handleTokenChange = (event) => {
-    const token = tokenList.find(
-      (token) => token.address === event.target.value
-    );
-    console.log({ token });
-    setPreferredToken(token);
-  };
-
-  const handleWalletConnect = () => {
-    connect();
+    setPreferredTokenId(event.target.value);
   };
 
   const handleChangeAmount = (e) => {
@@ -72,57 +102,53 @@ const Pay = ({ paymentId }) => {
   const fetchPaymentDetails = useCallback(async () => {
     try {
       setIsMetadataLoading(true);
-      const res = await axios.get(`/api/links/${paymentId}`);
-      const { metadata, status, userId } = res.data?.data;
-      const { data } = await axios.get(`/api/users/${userId}`);
-      const {
-        preferred_chain_id,
-        preferred_token_address,
-        wallet_address,
-        amount,
-        notes,
-        isEditAmountEnabled = false,
-      } = metadata;
-      setAmount(amount);
+      const { data: res } = await axios.get(`/api/links/${paymentId}`);
+      const paymentLink = res.data;
+
+      const { data: resUser } = await axios.get(
+        `/api/users/${paymentLink.userId}`
+      );
+      const user = resUser.data;
+
+      setName(paymentLink.name);
+      setAmount(paymentLink.amount);
+      setDescription(paymentLink.description);
+
       setMerchantInfo({
-        chainId: preferred_chain_id,
-        tokenAddress: preferred_token_address,
-        walletAddress: wallet_address,
-        notes,
-        name: data.data?.name,
-        isEditAmountEnabled,
+        chainId: user.preferred_chain_id,
+        tokenAddress: user.preferred_token_address,
+        walletAddress: user.wallet_address,
+        name: user.name,
+        logoURL: user.logoUrl,
       });
     } catch (err) {
       console.log({ err });
     } finally {
       setIsMetadataLoading(false);
     }
-  });
+  }, [paymentId]);
 
   useEffect(() => {
     fetchPaymentDetails();
-  }, [paymentId]);
+  }, [fetchPaymentDetails, paymentId]);
 
-  // router protocol integration
-  const onFormSubmit = async (event) => {
-    console.log({ event });
+  const onFormSubmit = async (e) => {
+    e.preventDefault();
   };
 
   return (
     <GradientFullBgLayout>
-      <SwitchNetwork floating />
-
       <Box
         as="form"
-        padding="12"
+        padding={{ base: '6', md: '8' }}
         marginLeft={'4'}
         marginRight={'4'}
         background="white"
         width={500}
-        height={'70vh'}
+        maxHeight={{ base: '80vh', md: '70vh' }}
         rounded="lg"
         shadow="lg"
-        experimental_spaceY="2"
+        overflowY="auto"
         onSubmit={onFormSubmit}
       >
         {isMetadataLoading ? (
@@ -131,96 +157,159 @@ const Pay = ({ paymentId }) => {
           </Center>
         ) : (
           <>
-            <Flex justifyContent="space-between">
-              <Text fontSize="2xl" fontWeight="bold">
-                Pay - BlockPe
-              </Text>
+            <Flex justifyContent="space-between" alignItems="flex-start">
+              <Box>
+                <Image
+                  alt="Merchant Logo"
+                  boxSize="50px"
+                  src={merchantInfo.logoURL}
+                />
+                <Flex alignItems="baseline">
+                  <Text fontSize="1.5rem" fontWeight="medium" mt="2" mr="2">
+                    {merchantInfo.name}
+                  </Text>
+                  <Tooltip
+                    label={
+                      <Text>
+                        Merchant Account Address:
+                        <pre style={{ fontSize: '12px', fontWeight: 700 }}>
+                          {merchantInfo.walletAddress}
+                        </pre>
+                      </Text>
+                    }
+                  >
+                    <Box mt="4">
+                      <Question weight="bold" />
+                    </Box>
+                  </Tooltip>
+                </Flex>
+              </Box>
+              <Flex
+                flexDirection="column"
+                justifyContent="space-between"
+                alignItems="flex-end"
+              >
+                <Name size="sm" />
+              </Flex>
             </Flex>
 
-            <Text fontSize="md" fontWeight="medium">
-              {merchantInfo.name || 'Loading...'}
-            </Text>
-            <Text fontSize="lg">
-              {merchantInfo.walletAddress || 'Loading...'}
-            </Text>
+            <Box mt="4">
+              <SectionHeading>Product Name</SectionHeading>
+              <Text fontSize="sm" mt="1">
+                {name}
+              </Text>
+            </Box>
 
-            <Text fontSize="md" fontWeight="medium">
-              Payment Notes
-            </Text>
-            <Text fontSize="lg" marginBottom={8}>
-              {merchantInfo.notes || 'Loading...'}
-            </Text>
+            <Box mt="4">
+              <SectionHeading>Payment Notes</SectionHeading>
+              <Text fontSize="sm" mt="1">
+                {description || 'No notes'}
+              </Text>
+            </Box>
 
-            {/* <Center>
-          <Text fontSize="4xl">(6xl) In love with React & Next</Text>
-        </Center> */}
-            <FormControl isRequired>
-              <FormLabel>Chain</FormLabel>
-              <Select isRequired value={chainId} onChange={handleSelectChain}>
-                {Object.entries(chainNameToIdentifierMap).map(
-                  ([key, value], index) => (
-                    <option value={value} key={index}>
-                      <Text>{capitalize(key)}</Text>
+            <Flex
+              experimental_spaceX={{ base: 0, md: 4 }}
+              experimental_spaceY="4"
+              flexDirection={{ base: 'column', md: 'row' }}
+            >
+              <FormControl isRequired mt="4">
+                <FormLabel as={SectionHeading}>Chain</FormLabel>
+                <Select
+                  isRequired
+                  value={activeNetwork}
+                  onChange={handleSelectChain}
+                  mt="1"
+                >
+                  {chains.map((chain) => (
+                    <option value={chain.id} key={chain.id}>
+                      <Text>{chain.name}</Text>
                     </option>
-                  )
-                )}
-              </Select>
-            </FormControl>
+                  ))}
+                </Select>
+              </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel>Token</FormLabel>
-              <Select isRequired onChange={handleTokenChange}>
-                {tokenList.map((token) => (
-                  <option value={token.address} key={token._id}>
-                    <Text>
-                      {token.name} ({token.symbol})
-                    </Text>
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl isRequired>
-              <FormLabel>Amount</FormLabel>
-              <InputGroup marginBottom={8}>
-                <InputLeftAddon>
-                  <Image
-                    src={preferredToken.logoURI}
-                    alt={`${preferredToken.name} logo`}
-                    width={5}
-                    height={5}
+              <FormControl isRequired mt="4">
+                <FormLabel as={SectionHeading}>Token</FormLabel>
+                <Select isRequired onChange={handleTokenChange} mt="1">
+                  {tokensByChain[activeNetwork].map((token) => (
+                    <option value={token.address} key={token.address}>
+                      <Text>
+                        {token.name} ({token.symbol})
+                      </Text>
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Flex>
+
+            <Flex
+              experimental_spaceX={{ base: 0, md: 4 }}
+              experimental_spaceY="4"
+              flexDirection={{ base: 'column', md: 'row' }}
+            >
+              <FormControl isRequired mt="4">
+                <FormLabel as={SectionHeading}>Amount</FormLabel>
+                <InputGroup mt="1">
+                  <InputLeftAddon>
+                    <Image
+                      src={preferredToken.logoURI}
+                      alt={`${preferredToken.name} logo`}
+                      width={5}
+                      height={5}
+                    />
+                  </InputLeftAddon>
+                  <Input
+                    disabled={!merchantInfo.isEditAmountEnabled}
+                    type="text"
+                    placeholder={`Enter ${preferredToken.name}`}
+                    value={amount}
+                    onChange={handleChangeAmount}
                   />
-                </InputLeftAddon>
-                <Input
-                  disabled={!merchantInfo.isEditAmountEnabled}
-                  type="string"
-                  placeholder={`Enter ${preferredToken.name}`}
-                  value={amount}
-                  onChange={handleChangeAmount}
-                />
-              </InputGroup>
-            </FormControl>
-            <Center w="full">
-              {!isConnected ? (
-                <PrimaryButton
-                  isLoading={loading}
-                  size="lg"
-                  width="100%"
-                  type="button"
-                  onClick={handleWalletConnect}
-                >
-                  Connect Wallet
-                </PrimaryButton>
-              ) : (
-                <PrimaryButton
-                  width="100%"
-                  size="lg"
-                  type="submit"
-                  onClick={onFormSubmit}
-                >
-                  Pay Now
-                </PrimaryButton>
-              )}
-            </Center>
+                </InputGroup>
+              </FormControl>
+              <FormControl isRequired mt="4">
+                <FormLabel as={SectionHeading}>INR Value</FormLabel>
+                <InputGroup mt="1">
+                  <InputLeftAddon>
+                    <Image
+                      src="/inr-logo.png"
+                      alt={`INR logo`}
+                      width={5}
+                      height={5}
+                    />
+                  </InputLeftAddon>
+                  <Input
+                    disabled={!merchantInfo.isEditAmountEnabled}
+                    type="text"
+                    placeholder={`Enter ${preferredTokenId.name}`}
+                    value={`${Number(amount) * 101151}`}
+                    onChange={handleChangeAmount}
+                  />
+                </InputGroup>
+              </FormControl>
+            </Flex>
+
+            {!isConnected ? (
+              <PrimaryButton
+                isLoading={isLoading}
+                width="100%"
+                type="button"
+                mt="6"
+                onClick={connect}
+                leftIcon={<Lock weight="bold" />}
+              >
+                Connect Wallet
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton
+                width="100%"
+                type="submit"
+                mt="6"
+                leftIcon={<Lock weight="bold" />}
+              >
+                Pay Securely
+              </PrimaryButton>
+            )}
           </>
         )}
       </Box>

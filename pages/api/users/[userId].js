@@ -1,5 +1,4 @@
-import { getUserById } from "~/server/firebaseUtils";
-
+import { getUserById } from '~/server/firebaseUtils';
 
 async function getUserDetails(res, userId) {
   try {
@@ -26,21 +25,20 @@ async function updateUserDetails(res, userId) {
   }
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const userId = req.query.userId;
   const payload = req.body.data;
-  switch(req.method) {
-    case "GET": {
-      getUserDetails(res, userId);
+  switch (req.method) {
+    case 'GET': {
+      await getUserDetails(res, userId);
       break;
     }
-    case "PUT": {
-      updateUserDetails(res, payload)
+    case 'PUT': {
+      await updateUserDetails(res, payload);
       break;
     }
-    default : {
-      res.status(400).json({ msg: "Method Not Allowed" });
+    default: {
+      res.status(400).json({ msg: 'Method Not Allowed' });
     }
-    
-  } 
+  }
 }

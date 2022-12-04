@@ -10,13 +10,7 @@ import { useUserId } from '~/hooks/use-user-id';
 import { layoutNames } from '~/layouts';
 
 const HomePage = () => {
-  const { userId, address } = useUserId();
-  const { provider } = useBetterAuth();
-
-  useEffect(() => {
-    const res = provider?.getSigner(address);
-    console.log(res);
-  }, [address, provider]);
+  const { address } = useUserId();
 
   return (
     <div>

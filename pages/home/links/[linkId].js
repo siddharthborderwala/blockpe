@@ -52,20 +52,15 @@ const PaymentLink = ({ linkId }) => {
     try {
       setIsPaymentLinkInfoLoading(true);
       const res = await axios.get(`/api/links/${linkId}`);
-      const { metadata, userId } = res.data?.data;
+      const { userId, ...metadata } = res.data?.data;
+      const { name, amount, description } = metadata;
 
       const { data } = await axios.get(`/api/users/${userId}`);
-      const { preferred_token_address, amount, notes } = metadata;
-
-      const token = tokens.find(
-        (token) => token.address === preferred_token_address
-      )?.symbol;
 
       setPaymentLinkInfo({
-        notes,
-        token,
-        name: data.data?.name,
-        amount: amount,
+        description,
+        name,
+        amount,
       });
     } catch (err) {
       console.log({ err });
@@ -117,31 +112,15 @@ const PaymentLink = ({ linkId }) => {
                 <Text as="strong" fontSize="1.2rem">
                   Payment Notes:{' '}
                 </Text>
-                <Text>{paymentLinkInfo.notes}</Text>
+                <Text>{paymentLinkInfo.description}</Text>
               </Box>
 
-              {/* <Box marginTop="1.2rem">
+              <Box mt="5">
                 <Text as="strong" fontSize="1.2rem">
-                  Expires In:{' '}
+                  Amount
                 </Text>
-                <Text>6 hrs</Text>
-              </Box> */}
-
-              <Flex justifyContent="space-between" marginTop="1.2rem">
-                <Box>
-                  <Text as="strong" fontSize="1.2rem">
-                    Token:{' '}
-                  </Text>
-                  <Text>{paymentLinkInfo.token}</Text>
-                </Box>
-
-                <Box>
-                  <Text as="strong" fontSize="1.2rem">
-                    Amount:{' '}
-                  </Text>
-                  <Text>{paymentLinkInfo.amount}</Text>
-                </Box>
-              </Flex>
+                <Text>{paymentLinkInfo.amount}</Text>
+              </Box>
             </Box>
           </GridItem>
 

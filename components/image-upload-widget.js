@@ -49,7 +49,6 @@ const UploadWidget = ({ children, onUpload }) => {
    */
 
   function open() {
-    console.log('open');
     if (!widget?.current) {
       widget.current = createWidget();
     }

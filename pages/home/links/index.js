@@ -1,20 +1,29 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
+  Grid,
+  Heading,
+  Spinner,
   TableContainer,
-  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
   Thead,
   Tr,
-  Th,
-  Td,
-  Tbody,
-  Text,
+  Table,
+  IconButton,
+  useToast,
 } from '@chakra-ui/react';
+import axios from 'axios';
 import Link from 'next/link';
-import { Plus } from 'phosphor-react';
-import React from 'react';
+import { ClipboardText, Plus } from 'phosphor-react';
+import React, { useState } from 'react';
+import { useEffect } from 'react';
 import PageHeading from '~/components/page-heading';
+import { useUserId } from '~/hooks/use-user-id';
 import { layoutNames } from '~/layouts';
 import { PaymentURL } from '~/components/PaymentURL';
 import dayjs from 'dayjs';
@@ -23,10 +32,22 @@ import { PAYMENT_LINK_BASE_URL } from '~/constants';
 import { useGetAllPaymentLinks } from '~/hooks/useGetAllPaymentLinks';
 
 const AllLinks = () => {
-  const { isLoading, allLinks } = useGetAllPaymentLinks();
+  const { userId } = useUserId();
+  const [isLoading, setIsLoading] = useState(true);
+  const [links, setLinks] = useState(null);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!userId) return;
+
+    axios.get(`/api/links/user/${userId}`).then(({ data }) => {
+      setLinks(data.data);
+      setIsLoading(false);
+    });
+  }, [userId]);
 
   return (
-    <Box>
+    <Grid templateRows="min-content 1fr" gap="8" height="full">
       <Flex alignItems="flex-end" justifyContent="space-between">
         <Box>
           <PageHeading>Payment Links</PageHeading>
@@ -41,68 +62,67 @@ const AllLinks = () => {
           New
         </Button>
       </Flex>
-
-      <TableContainer marginTop="2rem">
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Timestamp</Th>
-              <Th>Link</Th>
-              <Th isNumeric>Amount</Th>
-              <Th>Status</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {allLinks.length > 0 ? (
-              allLinks.map((link) => {
-                const date = dayjs(link.metadata.timestamp).format(
-                  '(MMM DD, YYYY) hh:mm A'
-                );
-
-                const tokenSymbol = tokens.find(
-                  (token) =>
-                    token.address === link.metadata.preferred_token_address
-                )?.symbol;
-
-                return (
-                  <Tr key={link.id}>
-                    <Td>{date}</Td>
-                    <Td>
-                      <PaymentURL
-                        linkURL={`${PAYMENT_LINK_BASE_URL}/${link.id}`}
-                        textProps={{ width: '25rem' }}
-                      />
-                    </Td>
-                    <Td isNumeric>
-                      {link.metadata.amount} {tokenSymbol}
-                    </Td>
-                    <Td>
-                      {link.status[0] + link.status.slice(1).toLowerCase()}
-                    </Td>
-                  </Tr>
-                );
-              })
-            ) : isLoading ? (
-              <Tr>
-                <Td colSpan={4}>
-                  <Text textAlign="center" padding="1rem">
-                    Getting all the payment links...
-                  </Text>
-                </Td>
-              </Tr>
+      {/* List of all the links fetched from the firebase collection paymentLinks */}
+      <Box w="full" height="full">
+        {isLoading ? (
+          <Center h="full">
+            <Spinner />
+          </Center>
+        ) : (
+          <>
+            {links ? (
+              <TableContainer>
+                <Table size="sm">
+                  <Thead>
+                    <Tr>
+                      <Th>Name</Th>
+                      <Th isNumeric>Price</Th>
+                      <Th>Link</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {links.map((l) => {
+                      return (
+                        <Tr key={l.id} justifyContent="space-between">
+                          <Td>
+                            <Link href={`links/${l.id}`}>{l.name}</Link>
+                          </Td>
+                          <Td isNumeric>{l.amount}</Td>
+                          <Td display="flex" alignItems="center">
+                            <pre style={{ fontSize: '12px', fontWeight: 500 }}>
+                              {window.location.host + '/pay/' + l.id}
+                            </pre>
+                            <IconButton
+                              size="xs"
+                              ml="auto"
+                              variant="outline"
+                              onClick={() => {
+                                navigator.clipboard.writeText(
+                                  window.location.host + '/pay/' + l.id
+                                );
+                                toast({
+                                  status: 'info',
+                                  title: 'Copied to clipboard',
+                                });
+                              }}
+                              icon={<ClipboardText />}
+                            />
+                          </Td>
+                        </Tr>
+                      );
+                    })}
+                  </Tbody>
+                </Table>
+              </TableContainer>
             ) : (
-              <Tr>
-                <Td colSpan={4}>
-                  <Text textAlign="center" padding="1rem">
-                    Nothing to show
-                  </Text>
-                </Td>
-              </Tr>
+              <Center h="full">
+                <Text>No Links</Text>
+              </Center>
             )}
-          </Tbody>
-        </Table>
-      </TableContainer>
-    </Box>
+          </>
+        )}
+      </Box>
+    </Grid>
   );
 };
 

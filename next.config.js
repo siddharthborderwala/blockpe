@@ -8,6 +8,11 @@ const nextConfig = {
         destination: '/join',
         permanent: true,
       },
+      {
+        source: '/home',
+        destination: '/home/links',
+        permanent: true,
+      },
     ];
   },
 };

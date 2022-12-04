@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { tokens } from '~/data';
+import { chains, tokens, tokensByChain } from '~/data';
 import axios from 'axios';
 import { GradientFullBgLayout } from '~/components/GradientFullBgLayout';
 import { layoutNames } from '~/layouts';
@@ -28,38 +28,17 @@ import { Plus } from 'phosphor-react';
 import { PrimaryButton } from '~/components/primary-button';
 import PageHeading from '~/components/page-heading';
 import { useBetterAuth } from '~/contexts/better-auth';
+import { useUserId } from '~/hooks/use-user-id';
 
 const expireOptions = [0, 6, 12, 24];
 
 const CreateLink = () => {
+  const { userId, account } = useUserId();
   const router = useRouter();
-  const [notes, setNotes] = useState('');
-  const { account } = useBetterAuth();
-  const [tokenInfo, setTokenInfo] = useState({
-    amount: '',
-    chainId: '',
-    tokenAddress: '0x0000000000000000000000000000000000000000', // eth-address
-  });
-
-  const [selectedToken, setSelectedToken] = useState({
-    logoURI:
-      'https://static.debank.com/image/token/logo_url/eth/935ae4e4d1d12d59a99717a24f2540b5.png',
-    name: 'ETH',
-  });
-  const [expiresIn, setExpiresIn] = useState(0);
-
-  useEffect(() => {
-    const selectedToken = tokens.find(
-      (token) => token.address === tokenInfo.tokenAddress
-    );
-
-    setSelectedToken({
-      logoURI: selectedToken.logoURI,
-      name: selectedToken.name,
-    });
-
-    setTokenInfo((prev) => ({ ...prev, chainId: selectedToken.chainId }));
-  }, [tokenInfo.tokenAddress]);
+  const [merchantData, setMerchantData] = useState(null);
+  const [amount, setAmount] = useState('');
+  const [linkName, setLinkName] = useState('');
+  const [linkDescription, setLinkDescription] = useState('');
 
   // to Resolve - Error: Hydration failed because the initial UI does not match what was rendered on the server.
   const [showChild, setShowChild] = useState(false);
@@ -67,32 +46,33 @@ const CreateLink = () => {
     setShowChild(true);
   }, []);
 
+  const onFormSubmit = async (e) => {
+    e.preventDefault();
+
+    const { data } = await axios.post('/api/links/new', {
+      wallet_address: merchantData.wallet_address,
+      name: linkName,
+      amount: amount,
+      description: linkDescription,
+      active: true,
+    });
+
+    router.push(`/home/links/${data.payment_id}`);
+  };
+
+  useEffect(() => {
+    if (userId) {
+      axios.get('/api/users/' + userId).then((res) => {
+        const { data } = res;
+        if (!data.data) return;
+        setMerchantData(data.data);
+      });
+    }
+  }, [userId]);
+
   if (!showChild) {
     return null;
   }
-
-  const updateMerchantData = (event) => {
-    setMerchantData((prev) => ({
-      ...prev,
-      [event.target.name]: event.target.value,
-    }));
-  };
-
-  const onFormSubmit = async (event) => {
-    event.preventDefault();
-
-    const requestData = {
-      notes: notes,
-      amount: tokenInfo.amount,
-      expiry: expiresIn,
-      preferred_token_address: tokenInfo.tokenAddress,
-      preferred_chain_id: tokenInfo.chainId,
-      wallet_address: account,
-    };
-
-    const { data } = await axios.post('/api/links/new', { data: requestData });
-    router.push(`/home/links/${data.payment_id}`);
-  };
 
   return (
     <Grid templateColumns="4fr 3fr">
@@ -103,100 +83,56 @@ const CreateLink = () => {
         </Box>
 
         <Box as="form" experimental_spaceY="4" mt="8" onSubmit={onFormSubmit}>
-          {/* <FormControl isRequired>
+          <FormControl isRequired>
             <FormLabel>Name</FormLabel>
             <Input
               width="full"
               type="text"
-              placeholder="BlockPe"
+              placeholder="Lavender Scented Candle"
               name="name"
-              value={merchantData.name}
-              onChange={updateMerchantData}
+              value={linkName}
+              onChange={(e) => setLinkName(e.target.value)}
             />
-          </FormControl> */}
-
-          <FormControl isRequired>
-            <FormLabel>Expires In</FormLabel>
-            <Select
-              width="12rem"
-              value={expiresIn}
-              onChange={(event) => setExpiresIn(Number(event.target.value))}
-            >
-              {expireOptions.map((value) => (
-                <option value={value} key={value}>
-                  {value} hrs
-                </option>
-              ))}
-            </Select>
-            {expiresIn === 0 ? (
-              <FormHelperText>
-                Value 0 means the link does not expire
-              </FormHelperText>
-            ) : null}
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel>Payment Notes</FormLabel>
+            <FormLabel>Description</FormLabel>
             <Textarea
               type="text"
-              placeholder="Pay for your drive"
-              name="notes"
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
+              placeholder="This scented candle is the perfect mixture of soothing and awakening"
+              name="description"
+              value={linkDescription}
+              onChange={(e) => setLinkDescription(e.target.value)}
             />
           </FormControl>
 
-          <Input value="0z123" hidden />
-
-          <Flex>
-            <FormControl isRequired>
-              <FormLabel>Token</FormLabel>
-              <Select
-                width="15rem"
-                isRequired
-                value={tokenInfo.tokenAddress}
-                onChange={(event) => {
-                  setTokenInfo((prev) => ({
-                    ...prev,
-                    tokenAddress: event.target.value,
-                  }));
-                }}
-              >
-                {tokens.map((token) => (
-                  <option value={token.address} key={token._id}>
-                    <Text>
-                      {token.name} ({token.symbol})
-                    </Text>
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl isRequired>
-              <FormLabel>Amount</FormLabel>
-              <InputGroup>
-                <InputLeftAddon>
+          <FormControl>
+            <FormLabel>Amount</FormLabel>
+            <InputGroup>
+              <InputLeftAddon>
+                {merchantData && (
                   <Image
-                    src={selectedToken.logoURI}
-                    alt={`${selectedToken.name} logo`}
-                    width={5}
-                    height={5}
-                  />
-                </InputLeftAddon>
-                <Input
-                  type="string"
-                  placeholder="amount to receive"
-                  value={tokenInfo.amount}
-                  onChange={(event) =>
-                    setTokenInfo((prev) => ({
-                      ...prev,
-                      amount: event.target.value,
-                    }))
-                  }
-                />
-              </InputGroup>
-            </FormControl>
-          </Flex>
+                    alt="L"
+                    h={5}
+                    w={5}
+                    src={
+                      tokensByChain[merchantData.preferred_chain_id].find(
+                        ({ address }) =>
+                          address === merchantData.preferred_token_address
+                      ).logoURI
+                    }
+                  ></Image>
+                )}
+              </InputLeftAddon>
+              <Input
+                type="text"
+                placeholder="2.50"
+                name="amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </InputGroup>
+          </FormControl>
 
           <Spacer />
 

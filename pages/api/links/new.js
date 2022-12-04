@@ -3,22 +3,13 @@ import {
   createLink,
   getUserByWalletAddress,
 } from '../../../server/firebaseUtils';
+
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { wallet_address } = req.body.data;
+    const { wallet_address } = req.body;
     try {
       const user = await getUserByWalletAddress(wallet_address);
-      // let userId;
-      // if (!user.id) {
-      //   userId = await addUser({ name, description, wallet_address });
-      // } else {
-      //   userId = user.id;
-      // }
-      console.log({ user });
-      const paymentId = await createLink(user.id, {
-        ...req.body.data,
-        timestamp: new Date().getTime(),
-      });
+      const paymentId = await createLink(user.id, req.body);
 
       const response = {
         isSuccess: true,

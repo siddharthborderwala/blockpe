@@ -14,22 +14,17 @@ export const useUserId = () => {
   useProtected();
 
   useEffect(() => {
-    const loadUser = async () => {
-      if (!account) return null;
-      const user = await getUserByWalletAddress(account);
-      if (user) {
-        return user.id;
-      }
-      return null;
-    };
+    if (!account) return null;
 
-    loadUser().then((id) => {
-      if (!id) {
+    const loadUser = async () => {
+      const user = await getUserByWalletAddress(account);
+      if (!user.id) {
         replace('/onboard');
       }
-      setUserId(id);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      setUserId(user.id);
+    };
+
+    loadUser();
   }, [account]);
 
   return {

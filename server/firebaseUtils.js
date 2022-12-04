@@ -59,13 +59,15 @@ export async function getUserById(userId) {
   }
 }
 
-export async function createLink(userId, metadata) {
+export async function createLink(userId, data) {
+  const doc = {
+    userId,
+    name: data.name,
+    description: data.description,
+    amount: data.amount,
+  };
   try {
-    const paymentRef = await db.collection('paymentLinks').add({
-      userId,
-      metadata,
-      status: PAYMENT_LINK_STATUS.ACTIVE,
-    });
+    const paymentRef = await db.collection('paymentLinks').add(doc);
     return paymentRef.id;
   } catch (err) {
     console.error('Error creating payment link: ', err);

@@ -8,11 +8,13 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import { ethers } from 'ethers';
 import { CaretDown, Circle } from 'phosphor-react';
 import React, { useCallback, useState } from 'react';
-import { chains, useActiveNetwork } from '~/atoms/active-network';
+import { useActiveNetwork } from '~/atoms/active-network';
 import { useWeb3Auth } from '~/contexts/auth';
 import { useBetterAuth } from '~/contexts/better-auth';
+import { chains } from '~/data';
 
 export const SwitchNetwork = ({ floating = false }) => {
   const [activeNetwork, setActiveNetwork] = useActiveNetwork();
@@ -22,7 +24,9 @@ export const SwitchNetwork = ({ floating = false }) => {
   const handleNetworkChange = useCallback(
     async (chainId) => {
       try {
-        await provider?.send('wallet_switchEthereumChain', [{ chainId }]);
+        await provider?.send('wallet_switchEthereumChain', [
+          { chainId: `${ethers.utils.hexValue(chainId)}` },
+        ]);
         setActiveNetwork(chainId);
       } catch (err) {
         if (err.code) {
@@ -36,6 +40,8 @@ export const SwitchNetwork = ({ floating = false }) => {
     },
     [setActiveNetwork, toast, provider]
   );
+
+  const activeChain = chains.find(({ id }) => id === activeNetwork);
 
   return (
     <Box
@@ -55,12 +61,15 @@ export const SwitchNetwork = ({ floating = false }) => {
           w="full"
           disabled={!provider}
         >
-          <Text ml="2">{chains[activeNetwork].chainName}</Text>
+          <Text ml="2">{activeChain.name}</Text>
         </MenuButton>
         <MenuList>
-          {Object.entries(chains).map(([key, chain]) => (
-            <MenuItem key={key} onClick={() => handleNetworkChange(key)}>
-              {chain.chainName}
+          {chains.map((chain) => (
+            <MenuItem
+              key={chain.id}
+              onClick={() => handleNetworkChange(chain.id)}
+            >
+              {chain.name}
             </MenuItem>
           ))}
         </MenuList>

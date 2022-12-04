@@ -47,7 +47,7 @@ const Join = () => {
     if (isConnected) {
       replace('/home/links');
     }
-  }, [isConnected, replace]);
+  }, [isConnected]);
 
   return (
     <Center

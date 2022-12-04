@@ -11,7 +11,7 @@ export const useProtected = () => {
     if (!isConnected) {
       replace('/join');
     }
-  }, [isConnected, replace]);
+  }, [isConnected]);
 
   return { account, isConnected };
 };

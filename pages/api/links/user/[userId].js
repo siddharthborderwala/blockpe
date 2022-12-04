@@ -13,11 +13,11 @@ async function getLinks(res, userId) {
   }
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const userId = req.query.userId;
   switch (req.method) {
     case 'GET': {
-      getLinks(res, userId);
+      await getLinks(res, userId);
       break;
     }
     default: {
