@@ -17,6 +17,7 @@ import { tokens } from '~/data';
 import axios from 'axios';
 import { PaymentURL } from '~/components/PaymentURL';
 import { PAYMENT_LINK_BASE_URL } from '~/constants';
+import { useRouter } from 'next/router';
 
 const opts = {
   errorCorrectionLevel: 'H',
@@ -27,7 +28,10 @@ const opts = {
   },
 };
 
-const PaymentLink = ({ linkId }) => {
+const PaymentLink = () => {
+  const {
+    query: { linkId },
+  } = useRouter();
   const [qrCodeSrc, setQRCodeSrc] = useState('');
   const paymentLink = useMemo(
     () => `${PAYMENT_LINK_BASE_URL}/${linkId ?? ''}`,
@@ -78,7 +82,7 @@ const PaymentLink = ({ linkId }) => {
       <GridItem colSpan={3}>
         <Box>
           <PageHeading>Payment Link</PageHeading>
-          <Text>Share this link and get your pay</Text>
+          <Text>Share this link and get your payment</Text>
         </Box>
       </GridItem>
 
@@ -101,12 +105,12 @@ const PaymentLink = ({ linkId }) => {
                 borderRadius="2xl"
               />
 
-              {/* <Box marginTop="1.2rem">
+              <Box marginTop="1.2rem">
                 <Text as="strong" fontSize="1.2rem">
                   Name:{' '}
                 </Text>
                 <Text>{paymentLinkInfo.name}</Text>
-              </Box> */}
+              </Box>
 
               <Box marginTop="1.2rem">
                 <Text as="strong" fontSize="1.2rem">
@@ -168,11 +172,3 @@ const PaymentLink = ({ linkId }) => {
 PaymentLink.layout = layoutNames.MERCHANT_DASHBOARD;
 
 export default PaymentLink;
-
-export async function getServerSideProps({ params }) {
-  return {
-    props: {
-      linkId: params?.linkId,
-    }, // will be passed to the page component as props
-  };
-}

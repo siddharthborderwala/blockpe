@@ -25,8 +25,8 @@ const Activity = () => {
 
   useEffect(() => {
     (async () => {
-      if (!isLoading) {
-        let allLinksChainIds = allLinks?.map(
+      if (!isLoading && allLinks) {
+        let allLinksChainIds = allLinks.map(
           (link) => link.metadata.preferred_chain_id
         );
         allLinksChainIds = [...new Set(allLinksChainIds)];

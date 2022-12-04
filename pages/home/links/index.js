@@ -26,7 +26,6 @@ import PageHeading from '~/components/page-heading';
 import { useUserId } from '~/hooks/use-user-id';
 import { layoutNames } from '~/layouts';
 import { PaymentURL } from '~/components/PaymentURL';
-import dayjs from 'dayjs';
 import { tokens } from '~/data';
 import { PAYMENT_LINK_BASE_URL } from '~/constants';
 import { useGetAllPaymentLinks } from '~/hooks/useGetAllPaymentLinks';
