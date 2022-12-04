@@ -27,15 +27,14 @@ import { layoutNames } from '~/layouts';
 import { Plus } from 'phosphor-react';
 import { PrimaryButton } from '~/components/primary-button';
 import PageHeading from '~/components/page-heading';
+import { useBetterAuth } from '~/contexts/better-auth';
 
 const expireOptions = [0, 6, 12, 24];
 
 const CreateLink = () => {
   const router = useRouter();
-  const [merchantData, setMerchantData] = useState({
-    name: '',
-    description: '',
-  });
+  const [notes, setNotes] = useState('');
+  const { account } = useBetterAuth();
   const [tokenInfo, setTokenInfo] = useState({
     amount: '',
     chainId: '',
@@ -83,16 +82,15 @@ const CreateLink = () => {
     event.preventDefault();
 
     const requestData = {
-      ...merchantData,
+      notes: notes,
       amount: tokenInfo.amount,
       expiry: expiresIn,
       preferred_token_address: tokenInfo.tokenAddress,
-      chainId: tokenInfo.chainId,
-      wallet_address: '0x111',
+      preferred_chain_id: tokenInfo.chainId,
+      wallet_address: account,
     };
 
     const { data } = await axios.post('/api/links/new', { data: requestData });
-    console.log('data', data);
     router.push(`/home/links/${data.payment_id}`);
   };
 
@@ -105,7 +103,7 @@ const CreateLink = () => {
         </Box>
 
         <Box as="form" experimental_spaceY="4" mt="8" onSubmit={onFormSubmit}>
-          <FormControl isRequired>
+          {/* <FormControl isRequired>
             <FormLabel>Name</FormLabel>
             <Input
               width="full"
@@ -115,7 +113,7 @@ const CreateLink = () => {
               value={merchantData.name}
               onChange={updateMerchantData}
             />
-          </FormControl>
+          </FormControl> */}
 
           <FormControl isRequired>
             <FormLabel>Expires In</FormLabel>
@@ -138,13 +136,13 @@ const CreateLink = () => {
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>Payment Notes</FormLabel>
             <Textarea
               type="text"
-              placeholder="BlockPe is a platform to help you to create a shareable payment link"
-              name="description"
-              value={merchantData.description}
-              onChange={updateMerchantData}
+              placeholder="Pay for your drive"
+              name="notes"
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
             />
           </FormControl>
 

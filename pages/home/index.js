@@ -14,7 +14,7 @@ const HomePage = () => {
   const { provider } = useBetterAuth();
 
   useEffect(() => {
-    const res = provider.getSigner(address);
+    const res = provider?.getSigner(address);
     console.log(res);
   }, [address, provider]);
 

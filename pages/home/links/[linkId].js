@@ -106,16 +106,16 @@ const PaymentLink = ({ linkId }) => {
                 borderRadius="2xl"
               />
 
-              <Box marginTop="1.2rem">
+              {/* <Box marginTop="1.2rem">
                 <Text as="strong" fontSize="1.2rem">
                   Name:{' '}
                 </Text>
                 <Text>{paymentLinkInfo.name}</Text>
-              </Box>
+              </Box> */}
 
               <Box marginTop="1.2rem">
                 <Text as="strong" fontSize="1.2rem">
-                  Description:{' '}
+                  Payment Notes:{' '}
                 </Text>
                 <Text>{paymentLinkInfo.notes}</Text>
               </Box>

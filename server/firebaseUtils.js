@@ -64,7 +64,7 @@ export async function createLink(userId, metadata) {
     const paymentRef = await db.collection('paymentLinks').add({
       userId,
       metadata,
-      status: PAYMENT_LINK_STATUS.PENDING,
+      status: PAYMENT_LINK_STATUS.ACTIVE,
     });
     return paymentRef.id;
   } catch (err) {

@@ -29,9 +29,8 @@ export const chainNameToIdentifierMap = {
 };
 
 export const PAYMENT_LINK_STATUS = {
-  PENDING: 'PENDING',
-  EXPIRED: 'EXPIRED',
-  PAID: 'PAID',
+  ACTIVE: 'ACTIVE',
+  IN_ACTIVE: 'IN_ACTIVE',
 };
 
 export const COVALENT_BASE_URL = 'https://api.covalenthq.com/v1';

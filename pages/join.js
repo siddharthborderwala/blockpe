@@ -45,7 +45,7 @@ const Join = () => {
 
   useEffect(() => {
     if (isConnected) {
-      replace('/home');
+      replace('/home/links');
     }
   }, [isConnected, replace]);
 

@@ -1,5 +1,4 @@
-import { getPaymentLinksByUserId } from "../../../../server/firebaseUtils";
-
+import { getPaymentLinksByUserId } from '../../../../server/firebaseUtils';
 
 async function getLinks(res, userId) {
   try {
@@ -16,13 +15,13 @@ async function getLinks(res, userId) {
 
 export default function handler(req, res) {
   const userId = req.query.userId;
-  switch(req.method) {
-    case "GET": {
+  switch (req.method) {
+    case 'GET': {
       getLinks(res, userId);
       break;
     }
-    default : {
-      res.status(400).json({ msg: "Method Not Allowed" });
+    default: {
+      res.status(400).json({ msg: 'Method Not Allowed' });
     }
-  } 
+  }
 }

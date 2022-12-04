@@ -13,25 +13,17 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { Plus } from 'phosphor-react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import PageHeading from '~/components/page-heading';
 import { layoutNames } from '~/layouts';
 import { PaymentURL } from '~/components/PaymentURL';
 import dayjs from 'dayjs';
-import axios from 'axios';
+import { tokens } from '~/data';
 import { PAYMENT_LINK_BASE_URL } from '~/constants';
+import { useGetAllPaymentLinks } from '~/hooks/useGetAllPaymentLinks';
 
 const AllLinks = () => {
-  const date = dayjs('2022-11-28T17:53:23Z').format('(MMM DD, YYYY) hh:mm A');
-  const url = `${PAYMENT_LINK_BASE_URL}/abc`;
-
-  useEffect(() => {
-    (async () => {
-      const { data } = await axios.get(`/api/links/user/${'userId'}`);
-
-      console.log('data', data);
-    })();
-  }, []);
+  const { isLoading, allLinks } = useGetAllPaymentLinks();
 
   return (
     <Box>
@@ -61,14 +53,52 @@ const AllLinks = () => {
             </Tr>
           </Thead>
           <Tbody>
-            <Tr>
-              <Td>{date}</Td>
-              <Td>
-                <PaymentURL linkURL={url} textProps={{ width: '25rem' }} />
-              </Td>
-              <Td isNumeric>0.01 ETH</Td>
-              <Td>Active</Td>
-            </Tr>
+            {allLinks.length > 0 ? (
+              allLinks.map((link) => {
+                const date = dayjs(link.metadata.timestamp).format(
+                  '(MMM DD, YYYY) hh:mm A'
+                );
+
+                const tokenSymbol = tokens.find(
+                  (token) =>
+                    token.address === link.metadata.preferred_token_address
+                )?.symbol;
+
+                return (
+                  <Tr key={link.id}>
+                    <Td>{date}</Td>
+                    <Td>
+                      <PaymentURL
+                        linkURL={`${PAYMENT_LINK_BASE_URL}/${link.id}`}
+                        textProps={{ width: '25rem' }}
+                      />
+                    </Td>
+                    <Td isNumeric>
+                      {link.metadata.amount} {tokenSymbol}
+                    </Td>
+                    <Td>
+                      {link.status[0] + link.status.slice(1).toLowerCase()}
+                    </Td>
+                  </Tr>
+                );
+              })
+            ) : isLoading ? (
+              <Tr>
+                <Td colSpan={4}>
+                  <Text textAlign="center" padding="1rem">
+                    Getting all the payment links...
+                  </Text>
+                </Td>
+              </Tr>
+            ) : (
+              <Tr>
+                <Td colSpan={4}>
+                  <Text textAlign="center" padding="1rem">
+                    Nothing to show
+                  </Text>
+                </Td>
+              </Tr>
+            )}
           </Tbody>
         </Table>
       </TableContainer>

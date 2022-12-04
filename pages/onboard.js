@@ -59,7 +59,8 @@ const Onboard = () => {
     setLogoURL(result?.info?.secure_url);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setIsSubmitting(true);
     try {
       const userId = await createUser({
@@ -70,7 +71,7 @@ const Onboard = () => {
         wallet_address: account,
         logoUrl: logoURL,
       });
-      replace('/home');
+      replace('/home/links');
     } catch (err) {
       toast({
         status: 'error',
@@ -84,7 +85,7 @@ const Onboard = () => {
 
   useEffect(() => {
     if (userId) {
-      replace('/home');
+      replace('/home/links');
     }
   }, [replace, userId]);
 

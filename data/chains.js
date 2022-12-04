@@ -58,7 +58,7 @@ export const chains = [
       ],
     },
     nativeToken: {
-      address: '0x0000000000000000000000000000000000000000',
+      address: '0x0000000000000000000000000000000000001010',
       symbol: 'MATIC',
       decimals: 18,
       chainId: 137,
@@ -94,7 +94,7 @@ export const chains = [
       ],
     },
     nativeToken: {
-      address: '0x0000000000000000000000000000000000000000',
+      address: '0x3BA4c387f786bFEE076A58914F5Bd38d668B42c3',
       symbol: 'BNB',
       decimals: 18,
       chainId: 56,
@@ -129,7 +129,7 @@ export const chains = [
       rpcUrls: ['https://rpc.ftm.tools/', 'https://rpcapi.fantom.network'],
     },
     nativeToken: {
-      address: '0x0000000000000000000000000000000000000000',
+      address: '0xC9c1c1c20B3658F8787CC2FD702267791f224Ce1',
       symbol: 'FTM',
       decimals: 18,
       chainId: 250,
@@ -160,7 +160,7 @@ export const chains = [
       rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
     },
     nativeToken: {
-      address: '0x0000000000000000000000000000000000000000',
+      address: '0x2C89bbc92BD86F8075d1DEcc58C7F4E0107f286b',
       symbol: 'AVAX',
       decimals: 18,
       chainId: 43114,
@@ -254,7 +254,7 @@ export const chains = [
       rpcUrls: ['https://evm-cronos.crypto.org'],
     },
     nativeToken: {
-      address: '0x0000000000000000000000000000000000000000',
+      address: '0xAdA58DF0F643D959C2A47c9D4d4c1a4deFe3F11C',
       symbol: 'CRO',
       decimals: 18,
       chainId: 25,

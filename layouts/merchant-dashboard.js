@@ -12,11 +12,11 @@ import { DashBoardName, Name } from '~/components/name';
 import { SwitchNetwork } from '~/components/switch-network';
 
 const dashboardLinks = [
-  {
-    name: 'Overview',
-    href: '/home',
-    icon: <HouseSimple weight="bold" />,
-  },
+  // {
+  //   name: 'Overview',
+  //   href: '/home',
+  //   icon: <HouseSimple weight="bold" />,
+  // },
   {
     name: 'Payment Links',
     href: '/home/links',
@@ -27,11 +27,11 @@ const dashboardLinks = [
     href: '/home/activity',
     icon: <ChartLineUp weight="bold" />,
   },
-  {
-    name: 'Settings',
-    href: '/home/settings',
-    icon: <Gear weight="bold" />,
-  },
+  // {
+  //   name: 'Settings',
+  //   href: '/home/settings',
+  //   icon: <Gear weight="bold" />,
+  // },
 ];
 
 const activeProperties = {
