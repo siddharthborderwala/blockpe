@@ -148,17 +148,6 @@ export const tokensByChain = {
         'https://static.debank.com/image/cro_token/logo_url/0xe44fd7fcb2b1581822d0c862b68222998a0c299a/61844453e63cf81301f845d7864236f6.png',
     },
     {
-      address: '0xf2001b145b43032aaf5ee2884e456ccd805f677d',
-      chainId: 25,
-      symbol: 'XDAI',
-      decimals: 18,
-      name: 'Dai Stablecoin',
-      priceUSD: '1.0003',
-      logoURI:
-        'https://static.debank.com/image/cro_token/logo_url/0xf2001b145b43032aaf5ee2884e456ccd805f677d/374d169fceec017e08ea0d62a5180754.png',
-      coinKey: 'XDAI',
-    },
-    {
       address: '0x062e66477faf219f25d27dced647bf57c3107d52',
       chainId: 25,
       symbol: 'WBTC',
@@ -407,17 +396,6 @@ export const tokensByChain = {
         'https://static.debank.com/image/coin/logo_url/usdc/e87790bfe0b3f2ea855dc29069b38818.png',
     },
     {
-      address: '0x049d68029688eabf473097a2fc38ef61633a3c7a',
-      symbol: 'fUSDT',
-      decimals: 6,
-      chainId: 250,
-      name: 'Frapped USDT',
-      coinKey: 'USDT',
-      priceUSD: '1',
-      logoURI:
-        'https://static.debank.com/image/coin/logo_url/usdt/23af7472292cb41dc39b3f1146ead0fe.png',
-    },
-    {
       address: '0x74b23882a30290451a17c44f4f05243b6b58c76d',
       symbol: 'ETH',
       decimals: 18,
@@ -508,28 +486,6 @@ export const tokensByChain = {
       priceUSD: '1',
       logoURI:
         'https://static.debank.com/image/coin/logo_url/usdc/e87790bfe0b3f2ea855dc29069b38818.png',
-    },
-    {
-      address: '0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664',
-      symbol: 'USDC.e',
-      decimals: 6,
-      chainId: 43114,
-      name: 'USD Coin',
-      coinKey: 'USDC',
-      priceUSD: '1',
-      logoURI:
-        'https://static.debank.com/image/coin/logo_url/usdc/e87790bfe0b3f2ea855dc29069b38818.png',
-    },
-    {
-      address: '0xc7198437980c041c805a1edcba50c1ce5db95118',
-      symbol: 'USDT.e',
-      decimals: 6,
-      chainId: 43114,
-      name: 'Tether USD',
-      coinKey: 'USDT',
-      priceUSD: '1',
-      logoURI:
-        'https://static.debank.com/image/coin/logo_url/usdt/23af7472292cb41dc39b3f1146ead0fe.png',
     },
   ],
   1313161554: [
